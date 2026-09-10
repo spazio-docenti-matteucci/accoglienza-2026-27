@@ -21,6 +21,7 @@ function closeIndex() {
 function goTo(index) {
   current = Math.max(0, Math.min(slides.length - 1, index));
   track.style.transform = `translateX(-${current * 100}%)`;
+  slides[current].scrollTop = 0;
   currentTitle.textContent = slides[current].dataset.title;
   counter.textContent = `${pad(current + 1)} / ${pad(slides.length)}`;
   progress.style.width = `${((current + 1) / slides.length) * 100}%`;

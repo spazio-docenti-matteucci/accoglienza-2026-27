@@ -62,13 +62,26 @@
               <p>Accoglienza e lettura di un breve messaggio motivazionale di benvenuto.</p>
               <p class="organization-note"><b>Proposta organizzativa</b> Presenza di due docenti curricolari in compresenza per ciascuna classe, affiancati dai docenti di sostegno per tutte le ore.</p>
             </div>
-            <div class="action-list">
-              <p><b>01</b><span>Patto di corresponsabilità <small>(slide)</small></span></p>
-              <p><b>02</b><span>Regolamento di Istituto <small>(slide)</small></span></p>
-              <p><b>03</b><span>Nota Ministeriale sull’uso dei cellulari</span></p>
-              <p><b>04</b><span>Presentazione Team Bullismo e Cyberbullismo</span></p>
-              <p><b>05</b><span>Appello e formazione delle classi</span></p>
-              <p><b>06</b><span>Accompagnamento nelle aule assegnate con i docenti in servizio <small>(verifica se docente di nuova immissione per supporto)</small></span></p>
+            <div class="aula-program">
+              <section class="technical-block" aria-labelledby="technical-title">
+                <header class="technical-header">
+                  <p>Presentazione tecnica</p>
+                  <h3 id="technical-title">Quattro contenuti essenziali</h3>
+                </header>
+                <div class="technical-list">
+                  <p><b>01</b><span>Patto di corresponsabilità <small>(slide)</small></span></p>
+                  <p><b>02</b><span>Regolamento di Istituto <small>(slide)</small></span></p>
+                  <p><b>03</b><span>Nota Ministeriale sull’uso dei cellulari</span></p>
+                  <p><b>04</b><span>Presentazione Team Bullismo e Cyberbullismo</span></p>
+                </div>
+              </section>
+              <section class="follow-up-block" aria-labelledby="follow-up-title">
+                <h3 id="follow-up-title">A seguire</h3>
+                <div class="follow-up-list">
+                  <p><b>05</b><span>Appello e formazione delle classi</span></p>
+                  <p><b>06</b><span>Accompagnamento nelle aule assegnate con i docenti in servizio <small>(verifica se docente di nuova immissione per supporto)</small></span></p>
+                </div>
+              </section>
             </div>
           </div>
         </section>
@@ -117,8 +130,7 @@
               <article class="welcome-card"><span>01</span><h3>Discorso di accoglienza e buoni propositi per il nuovo anno scolastico.</h3><p>Affrontare con decisione le criticità emerse, lavorarci e rilanciare verso nuovi obiettivi.</p></article>
               <article><span>02</span><h3>Presentazione Regolamento di Istituto.</h3></article>
               <article><span>03</span><h3>Nota Ministeriale sull’uso dei cellulari.</h3></article>
-              <article><span>04</span><h3>Prosecuzione attività secondo l’orario.</h3></article>
-              <article><span>05</span><h3>Presentazione E-Policy e regolamento antibullismo.</h3></article>
+              <article class="policy-card"><span>04</span><h3>Presentazione E-Policy e regolamento antibullismo.</h3></article>
             </div>
             <div class="closing-panel">
               <p><strong>11.00–11.15</strong><span>Pausa dentro le aule</span></p>
@@ -140,11 +152,17 @@
     </div>
 
     <footer class="controls">
-      <button id="prevButton" type="button" aria-label="Schermata precedente">←</button>
-      <div class="progress-wrap"><div class="progress-text"><span id="currentTitle">Obiettivi</span><strong id="counter">01 / 07</strong></div><div class="progress-bar"><span id="progress"></span></div></div>
-      <button id="nextButton" type="button" aria-label="Schermata successiva">→</button>
+      <button id="prevButton" type="button" aria-label="Schermata precedente">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg>
+      </button>
+      <div class="control-center">
+        <div class="progress-wrap"><div class="progress-text"><span id="currentTitle">Obiettivi</span><strong id="counter">01 / 07</strong></div><div class="progress-bar"><span id="progress"></span></div></div>
+        <p class="disclaimer">Spazio operativo non ufficiale · Non è il sito istituzionale della scuola</p>
+      </div>
+      <button id="nextButton" type="button" aria-label="Schermata successiva">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+      </button>
     </footer>
-    <p class="disclaimer">Spazio operativo non ufficiale · Non è il sito istituzionale della scuola</p>
   </main>
   <script src="presentation.js"></script>
 </body>
