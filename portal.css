@@ -29,12 +29,13 @@ a { color: inherit; }
 .page-nav a:hover, .back-link:hover { color: var(--green); border-color: var(--teal); }
 
 main { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
-.hero { min-height: 350px; padding: clamp(54px, 8vw, 95px) clamp(26px, 6vw, 72px); display: flex; align-items: center; overflow: hidden; position: relative; border-radius: 0 0 42px 42px; color: white; background: linear-gradient(135deg, var(--navy) 0%, #175e68 100%); box-shadow: 0 26px 70px rgb(18 60 87 / 18%); }
+.hero { min-height: 420px; padding: clamp(54px, 8vw, 95px) clamp(26px, 6vw, 72px); display: flex; align-items: center; overflow: hidden; position: relative; border-radius: 0 0 42px 42px; color: white; background: linear-gradient(135deg, var(--navy) 0%, #175e68 100%); box-shadow: 0 26px 70px rgb(18 60 87 / 18%); }
 .hero::after, .orientation-hero::after { content: ""; width: min(590px, 56vw); height: 230px; position: absolute; top: -8px; right: -45px; background: url("motivo-circolare.png") center / 100% 100% no-repeat; opacity: .93; pointer-events: none; }
 .hero-copy { max-width: 680px; position: relative; z-index: 2; }
 .eyebrow, .step, .area-tag { margin: 0; font-size: .7rem; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
 .eyebrow { color: #c9f981; }
-.hero h1 { margin: 11px 0 18px; max-width: 760px; font-size: clamp(2.9rem, 7.7vw, 6.6rem); line-height: .9; letter-spacing: -.07em; }
+.hero h1 { margin: 11px 0 18px; max-width: 760px; font-size: clamp(2.9rem, 7vw, 5.6rem); line-height: .9; letter-spacing: -.07em; }
+.hero h1 span { color: #c9f981; font-size: .48em; letter-spacing: -.035em; }
 .hero-copy > p:last-child { max-width: 570px; margin: 0; color: #dce9ed; font-size: clamp(1rem, 2vw, 1.35rem); line-height: 1.45; }
 .hero-bubbles { position: absolute; right: 8%; bottom: 14%; display: flex; align-items: center; gap: 13px; }
 .hero-bubbles i { width: 14px; height: 14px; border-radius: 50%; background: var(--lime); }
@@ -98,7 +99,7 @@ main { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
 
 @media (max-width: 760px) {
   .site-header > p { display: none; }
-  .hero { min-height: 330px; border-radius: 0 0 30px 30px; }
+  .hero { min-height: 390px; border-radius: 0 0 30px 30px; }
   .hero::after, .orientation-hero::after { width: 85vw; opacity: .55; }
   .audience-buttons, .area-grid, .course-grid { grid-template-columns: 1fr; }
   .audience-buttons button { min-height: 62px; }
@@ -115,7 +116,7 @@ main { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
   .site-brand strong { font-size: .8rem; }
   .page-nav a:first-child { display: none; }
   .hero { padding-inline: 25px; }
-  .hero h1 { font-size: clamp(2.7rem, 17vw, 4.2rem); }
+  .hero h1 { font-size: clamp(2.7rem, 13vw, 3.4rem); }
   .audience-section, .areas-section { padding-inline: 0; }
   .area-card { padding: 22px; grid-template-columns: 1fr; }
   .area-number { width: 42px; height: 42px; }
