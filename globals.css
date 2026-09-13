@@ -25,8 +25,8 @@ button { font: inherit; }
 .brandline small { margin-top: 5px; color: var(--muted); font-size: .7rem; }
 .brandmark { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; color: white; background: var(--green); box-shadow: 0 0 0 5px rgb(121 207 27 / 18%); font-weight: 900; }
 .top-actions { display: flex; gap: 8px; }
-.top-actions button, .controls > button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; color: var(--navy); border: 1px solid var(--line); background: var(--white); border-radius: 12px; cursor: pointer; min-height: 42px; padding: 0 14px; font-weight: 750; font-size: .76rem; }
-.top-actions button:hover, .controls > button:hover:not(:disabled) { border-color: var(--teal); color: var(--green); }
+.top-actions button, .top-actions a, .controls > button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; color: var(--navy); border: 1px solid var(--line); background: var(--white); border-radius: 12px; cursor: pointer; min-height: 42px; padding: 0 14px; font-weight: 750; font-size: .76rem; text-decoration: none; }
+.top-actions button:hover, .top-actions a:hover, .controls > button:hover:not(:disabled) { border-color: var(--teal); color: var(--green); }
 
 .index-panel { position: fixed; z-index: 30; top: 86px; right: 20px; width: min(390px, calc(100vw - 40px)); padding: 18px; border: 1px solid var(--line); border-radius: 18px; background: rgb(255 255 255 / 97%); box-shadow: 0 24px 64px rgb(18 60 87 / 20%); }
 .index-panel > p { margin: 0 0 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .11em; font-weight: 800; font-size: .68rem; }
@@ -181,8 +181,8 @@ button { font: inherit; }
   .controls > button svg { width: 22px; height: 22px; }
   .progress-text { margin-bottom: 6px; }
   .disclaimer { margin-top: 5px; overflow: hidden; text-overflow: ellipsis; }
-  .brandline small, .top-actions button span:last-child { display: none; }
-  .top-actions button { width: 42px; padding: 0; }
+  .brandline small, .top-actions button span:last-child, .top-actions a span:last-child { display: none; }
+  .top-actions button, .top-actions a { width: 42px; padding: 0; }
   .slide { padding: 24px 18px; }
   .objective-grid, .schedule-comparison, .technical-list, .follow-up-list, .senior-activities { grid-template-columns: 1fr; }
   .technical-header { align-items: flex-start; flex-direction: column; }
