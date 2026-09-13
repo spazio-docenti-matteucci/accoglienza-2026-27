@@ -96,7 +96,11 @@ main { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
 .sia-card { --course-accent: var(--lime); --course-text: var(--navy); }
 .tur-card { --course-accent: var(--green); }
 .ssas-card { --course-accent: var(--pink); }
+.cat-card { --course-accent: var(--teal); --course-text: var(--navy); }
 .info-card { min-height: 285px; }
+.pending-card { border-style: solid; background: linear-gradient(145deg, white, #edf8f6); }
+.course-topline { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.status-badge { padding: 7px 10px; border-radius: 99px; color: var(--green); background: #e5f5e8; font-size: .66rem; font-weight: 900; letter-spacing: .04em; text-transform: uppercase; }
 .study-hero { background: linear-gradient(140deg, var(--navy), #237985); }
 .curricula-hero { background: linear-gradient(140deg, #315d17, var(--green)); }
 
