@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Card di socializzazione e identità dei corsi AFM, SIA, TUR e SSAS della sede Mattei di Decimomannu.">
-  <title>Card di socializzazione | Sede Mattei Decimomannu</title>
-  <link rel="stylesheet" href="portal.css">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="description" content="Area riservata ai docenti della Commissione Orientamento della sede Mattei di Decimomannu.">
+  <title>Commissione Orientamento | Area riservata</title>
+  <link rel="stylesheet" href="portal.css?v=20260915-1">
 </head>
 <body>
   <header class="site-header">
@@ -22,35 +23,53 @@
   <main class="orientation-main">
     <section class="orientation-hero">
       <a class="back-link" href="index.html"><span aria-hidden="true">←</span> Torna alla scelta</a>
-      <p class="eyebrow">Orientamento · Sede Mattei</p>
-      <h1>Card di socializzazione<br>e identità del corso</h1>
-      <p>Scegli l’indirizzo. Ogni PDF è pronto da aprire e stampare: in un foglio A4 trovi due card.</p>
+      <p class="eyebrow">Area docenti · Accesso riservato</p>
+      <h1>Commissione<br>Orientamento</h1>
+      <p>Documenti e materiali di lavoro condivisi esclusivamente con i docenti della commissione.</p>
     </section>
 
-    <section class="course-grid" aria-label="Card divise per indirizzo">
-      <article class="course-card afm-card">
-        <div class="course-code">AFM</div>
-        <div class="course-copy"><h2>Amministrazione,<br>Finanza e Marketing</h2><p>Aziende, idee, organizzazione e scelte.</p></div>
-        <div class="course-actions"><a href="documenti/card-socializzazione/Canovaccio_socializzazione_AFM_Mattei.pdf" target="_blank" rel="noopener">Apri e stampa <span aria-hidden="true">↗</span></a><a class="download-link" href="documenti/card-socializzazione/Canovaccio_socializzazione_AFM_Mattei.pdf" download>Scarica PDF</a></div>
-      </article>
+    <section class="protected-shell" aria-labelledby="access-title">
+      <div class="access-panel" id="loginPanel">
+        <div class="lock-symbol" aria-hidden="true">🔒</div>
+        <p class="step">Accesso commissione</p>
+        <h2 id="access-title">Inserisci la password</h2>
+        <p>La password è condivisa esclusivamente con i docenti della Commissione Orientamento.</p>
+        <form class="password-form" id="passwordForm">
+          <label for="orientationPassword">Password</label>
+          <div class="password-row">
+            <input id="orientationPassword" name="password" type="password" autocomplete="current-password" required>
+            <button type="submit">Entra</button>
+          </div>
+          <p class="access-message" id="accessMessage" role="status" aria-live="polite"></p>
+        </form>
+      </div>
 
-      <article class="course-card sia-card">
-        <div class="course-code">SIA</div>
-        <div class="course-copy"><h2>Sistemi Informativi<br>Aziendali</h2><p>Informatica, economia, dati e soluzioni.</p></div>
-        <div class="course-actions"><a href="documenti/card-socializzazione/Canovaccio_socializzazione_SIA_Mattei.pdf" target="_blank" rel="noopener">Apri e stampa <span aria-hidden="true">↗</span></a><a class="download-link" href="documenti/card-socializzazione/Canovaccio_socializzazione_SIA_Mattei.pdf" download>Scarica PDF</a></div>
-      </article>
+      <div class="workspace-panel" id="workspacePanel" hidden>
+        <div class="workspace-heading">
+          <div><p class="step">Commissione Orientamento</p><h2 id="workspaceTitle" tabindex="-1">Materiali condivisi</h2></div>
+          <div class="workspace-session"><span class="role-badge" id="roleBadge"></span><button class="logout-button" id="logoutButton" type="button">Esci</button></div>
+        </div>
 
-      <article class="course-card tur-card">
-        <div class="course-code">TUR</div>
-        <div class="course-copy"><h2>Turismo</h2><p>Luoghi, viaggi, lingue e organizzazione.</p></div>
-        <div class="course-actions"><a href="documenti/card-socializzazione/Canovaccio_socializzazione_TUR_Mattei.pdf" target="_blank" rel="noopener">Apri e stampa <span aria-hidden="true">↗</span></a><a class="download-link" href="documenti/card-socializzazione/Canovaccio_socializzazione_TUR_Mattei.pdf" download>Scarica PDF</a></div>
-      </article>
+        <section class="upload-panel" id="uploadPanel" aria-labelledby="upload-title">
+          <div><p class="step">Nuovo materiale</p><h3 id="upload-title">Carica un documento</h3></div>
+          <form class="upload-form" id="uploadForm">
+            <label>Titolo<input name="title" type="text" maxlength="300" required></label>
+            <label>Descrizione<textarea name="description" rows="3" maxlength="2000"></textarea></label>
+            <label>Chi può vederlo?
+              <select name="visibility">
+                <option value="orientatore">Solo i tre orientatori</option>
+                <option value="tutti">Tutti i componenti</option>
+              </select>
+            </label>
+            <label>File<input name="file" type="file" accept=".pdf,.docx,.xlsx,.pptx,.png,.jpg,.jpeg,.txt" required></label>
+            <button type="submit">Carica nell’area riservata</button>
+            <p class="upload-message" id="uploadMessage" role="status" aria-live="polite"></p>
+          </form>
+        </section>
 
-      <article class="course-card ssas-card">
-        <div class="course-code">SSAS</div>
-        <div class="course-copy"><h2>Servizi per la Sanità<br>e l’Assistenza Sociale</h2><p>Relazioni, ascolto, attività e benessere.</p></div>
-        <div class="course-actions"><a href="documenti/card-socializzazione/Canovaccio_socializzazione_SSAS_Mattei.pdf" target="_blank" rel="noopener">Apri e stampa <span aria-hidden="true">↗</span></a><a class="download-link" href="documenti/card-socializzazione/Canovaccio_socializzazione_SSAS_Mattei.pdf" download>Scarica PDF</a></div>
-      </article>
+        <div class="documents-heading"><p class="step">Archivio attivo</p><h3>Documenti disponibili</h3></div>
+        <div class="resource-grid" id="resourceGrid"></div>
+      </div>
     </section>
   </main>
 
@@ -58,5 +77,6 @@
     <p>I.I.S. A. Meucci – E. Mattei · Sede Mattei, Decimomannu</p>
     <p>Questo spazio non sostituisce il sito istituzionale della scuola.</p>
   </footer>
+  <script src="orientamento.js?v=20260915-1"></script>
 </body>
 </html>
