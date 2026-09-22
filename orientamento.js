@@ -12,9 +12,18 @@ const uploadPanel = document.getElementById('uploadPanel');
 const uploadForm = document.getElementById('uploadForm');
 const uploadMessage = document.getElementById('uploadMessage');
 const roleBadge = document.getElementById('roleBadge');
+const presentationUploadPanel = document.getElementById('presentationUploadPanel');
+const presentationUploadForm = document.getElementById('presentationUploadForm');
+const presentationUploadMessage = document.getElementById('presentationUploadMessage');
+const presentationViewer = document.getElementById('presentationViewer');
+const presentationFrame = document.getElementById('presentationFrame');
+const presentationViewerTitle = document.getElementById('presentationViewerTitle');
+const presentationViewerMessage = document.getElementById('presentationViewerMessage');
+const closePresentationButton = document.getElementById('closePresentation');
 
 let sessionToken = sessionStorage.getItem(SESSION_KEY) || '';
 let accessLevel = '';
+let presentationId = '';
 
 async function api(action, payload = {}, formData = null) {
   const headers = {};
@@ -48,18 +57,43 @@ function setAuthenticated(level) {
   loginPanel.hidden = true;
   workspacePanel.hidden = false;
   uploadPanel.hidden = level !== 'orientatore';
+  presentationUploadPanel.hidden = level !== 'orientatore';
   roleBadge.textContent = level === 'orientatore' ? 'Accesso completo' : 'Materiali condivisi';
   roleBadge.className = `role-badge ${level}`;
   document.getElementById('workspaceTitle').focus({ preventScroll: true });
 }
 
 function resetSession() {
+  closePresentation();
+  presentationId = '';
   sessionToken = '';
   accessLevel = '';
   sessionStorage.removeItem(SESSION_KEY);
   resourceGrid.replaceChildren();
   workspacePanel.hidden = true;
   loginPanel.hidden = false;
+}
+
+function closePresentation() {
+  presentationFrame.removeAttribute('srcdoc');
+  presentationViewer.hidden = true;
+}
+
+async function openPresentation(item) {
+  presentationViewerTitle.textContent = item.title;
+  presentationViewerMessage.textContent = 'Caricamento della presentazione…';
+  presentationFrame.removeAttribute('srcdoc');
+  presentationViewer.hidden = false;
+  closePresentationButton.focus();
+  try {
+    const result = await api('view_presentation', { document_id: item.id });
+    if (presentationViewer.hidden) return;
+    presentationFrame.srcdoc = result.html;
+    presentationViewerMessage.textContent = '';
+  } catch (error) {
+    presentationViewerMessage.textContent = error.message;
+    if (error.status === 401) resetSession();
+  }
 }
 
 function createActionButton(label, className, handler) {
@@ -79,7 +113,7 @@ async function replaceFile(item, input, status) {
   formData.set('document_id', item.id);
   formData.set('file', file);
   try {
-    await api('replace', {}, formData);
+    await api(item.kind === 'presentation' ? 'replace_presentation' : 'replace', {}, formData);
     status.textContent = 'Nuova versione caricata.';
     await loadDocuments();
   } catch (error) {
@@ -131,7 +165,10 @@ function renderDocument(item) {
 
   const actions = document.createElement('div');
   actions.className = 'document-actions';
-  if (item.url) {
+  if (item.kind === 'presentation') {
+    const openButton = createActionButton('Apri presentazione', 'presentation-open', () => openPresentation(item));
+    actions.append(openButton);
+  } else if (item.url) {
     const openLink = document.createElement('a');
     openLink.href = item.url;
     openLink.target = '_blank';
@@ -166,7 +203,7 @@ function renderDocument(item) {
 
     const replacementInput = document.createElement('input');
     replacementInput.type = 'file';
-    replacementInput.accept = '.pdf,.docx,.xlsx,.pptx,.png,.jpg,.jpeg,.txt';
+    replacementInput.accept = item.kind === 'presentation' ? '.html,text/html' : '.pdf,.docx,.xlsx,.pptx,.png,.jpg,.jpeg,.txt';
     replacementInput.className = 'replacement-input';
     replacementInput.setAttribute('aria-label', 'Sostituisci il file');
 
@@ -193,6 +230,7 @@ async function loadDocuments() {
   resourceGrid.textContent = 'Caricamento dei documenti…';
   try {
     const result = await api('list');
+    presentationId = result.documents.find((item) => item.kind === 'presentation')?.id || '';
     resourceGrid.replaceChildren();
     if (!result.documents.length) {
       const empty = document.createElement('p');
@@ -246,6 +284,30 @@ uploadForm.addEventListener('submit', async (event) => {
   } finally {
     submitButton.disabled = false;
   }
+});
+
+presentationUploadForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const submitButton = presentationUploadForm.querySelector('button');
+  submitButton.disabled = true;
+  presentationUploadMessage.textContent = 'Caricamento in corso…';
+  try {
+    const data = new FormData(presentationUploadForm);
+    if (presentationId) data.set('document_id', presentationId);
+    await api(presentationId ? 'replace_presentation' : 'upload_presentation', {}, data);
+    presentationUploadForm.reset();
+    presentationUploadMessage.textContent = 'Presentazione aggiornata.';
+    await loadDocuments();
+  } catch (error) {
+    presentationUploadMessage.textContent = error.message;
+  } finally {
+    submitButton.disabled = false;
+  }
+});
+
+closePresentationButton.addEventListener('click', closePresentation);
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && !presentationViewer.hidden) closePresentation();
 });
 
 logoutButton.addEventListener('click', async () => {

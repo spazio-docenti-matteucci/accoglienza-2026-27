@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex, nofollow, noarchive">
   <meta name="description" content="Area riservata ai docenti della Commissione Orientamento della sede Mattei di Decimomannu.">
   <title>Commissione Orientamento | Area riservata</title>
-  <link rel="stylesheet" href="portal.css?v=20260915-1">
+  <link rel="stylesheet" href="portal.css?v=20260922-1">
 </head>
 <body>
   <header class="site-header">
@@ -67,16 +67,31 @@
           </form>
         </section>
 
+        <section class="upload-panel" id="presentationUploadPanel" aria-labelledby="presentation-upload-title" hidden>
+          <div><p class="step">Analisi del bacino</p><h3 id="presentation-upload-title">Aggiorna la presentazione</h3></div>
+          <form class="upload-form" id="presentationUploadForm">
+            <label>Presentazione HTML<input name="file" type="file" accept=".html,text/html" required></label>
+            <button type="submit">Carica la presentazione</button>
+            <p class="upload-message" id="presentationUploadMessage" role="status" aria-live="polite"></p>
+          </form>
+        </section>
+
         <div class="documents-heading"><p class="step">Archivio attivo</p><h3>Documenti disponibili</h3></div>
         <div class="resource-grid" id="resourceGrid"></div>
       </div>
     </section>
   </main>
 
+  <div class="presentation-viewer" id="presentationViewer" role="dialog" aria-modal="true" aria-label="Presentazione del bacino" hidden>
+    <div class="presentation-toolbar"><strong id="presentationViewerTitle">Presentazione</strong><button id="closePresentation" type="button">Chiudi ×</button></div>
+    <p id="presentationViewerMessage" role="status"></p>
+    <iframe id="presentationFrame" title="Presentazione del bacino" sandbox="allow-scripts allow-popups" referrerpolicy="no-referrer"></iframe>
+  </div>
+
   <footer class="site-footer">
     <p>I.I.S. A. Meucci – E. Mattei · Sede Mattei, Decimomannu</p>
     <p>Questo spazio non sostituisce il sito istituzionale della scuola.</p>
   </footer>
-  <script src="orientamento.js?v=20260915-1"></script>
+  <script src="orientamento.js?v=20260922-1"></script>
 </body>
 </html>

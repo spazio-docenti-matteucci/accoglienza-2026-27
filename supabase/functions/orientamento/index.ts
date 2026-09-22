@@ -4,6 +4,9 @@ import { createClient } from "npm:@supabase/supabase-js@2.112.4";
 const SESSION_HOURS = 12;
 const SIGNED_URL_SECONDS = 300;
 const BUCKET = "orientamento-riservato";
+const PRESENTATION_PREFIX = "presentazioni/";
+const PRESENTATION_TITLE = "Residenti in età di ingresso alla prima superiore · coorti 2008–2013";
+const PRESENTATION_DESCRIPTION = "Analisi demografica dei comuni di provenienza degli iscritti alla sede di Decimomannu dell’IIS Meucci-Mattei. Fonte: ISTAT POSAS.";
 const VALID_LEVELS = new Set(["orientatore", "supporter"]);
 const ALLOWED_FILES = new Map([
   ["application/pdf", "pdf"],
@@ -15,6 +18,7 @@ const ALLOWED_FILES = new Map([
   ["text/plain", "txt"],
 ]);
 const MAX_FILE_SIZE = 25 * 1024 * 1024;
+const MAX_PRESENTATION_SIZE = 2 * 1024 * 1024;
 const ALLOWED_ORIGINS = new Set([
   "https://spazio-docenti-matteucci.github.io",
   "http://localhost:8765",
@@ -119,6 +123,19 @@ async function listDocuments(request: Request, accessLevel: "orientatore" | "sup
   if (error) return json(request, { error: "Impossibile caricare i documenti." }, 500);
 
   const documents = await Promise.all((data ?? []).map(async (document) => {
+    const isPresentation = document.object_path.startsWith(PRESENTATION_PREFIX);
+    if (isPresentation) {
+      return {
+        id: document.id,
+        title: document.titolo,
+        description: document.descrizione,
+        visibility: document.visibilita,
+        version: document.versione,
+        updated_at: document.updated_at,
+        kind: "presentation",
+        url: null,
+      };
+    }
     const { data: signed, error: signedError } = await admin.storage
       .from(BUCKET)
       .createSignedUrl(document.object_path, SIGNED_URL_SECONDS);
@@ -129,6 +146,7 @@ async function listDocuments(request: Request, accessLevel: "orientatore" | "sup
       visibility: document.visibilita,
       version: document.versione,
       updated_at: document.updated_at,
+      kind: "document",
       url: signedError ? null : signed.signedUrl,
     };
   }));
@@ -147,16 +165,23 @@ function cleanString(value: unknown, maxLength: number, required = false) {
   return cleaned;
 }
 
-function validateFile(value: unknown) {
+function validateFile(value: unknown, presentation = false) {
   if (!(value instanceof File) || value.size === 0) throw new Error("Scegli un file da caricare.");
+  if (presentation) {
+    if (value.size > MAX_PRESENTATION_SIZE) throw new Error("Il file HTML supera il limite di 2 MB.");
+    if (value.type !== "text/html" || !/\.html$/i.test(value.name)) {
+      throw new Error("Scegli un file .html valido.");
+    }
+    return { file: value, extension: "html" };
+  }
   if (value.size > MAX_FILE_SIZE) throw new Error("Il file supera il limite di 25 MB.");
   const extension = ALLOWED_FILES.get(value.type);
   if (!extension) throw new Error("Formato non consentito.");
   return { file: value, extension };
 }
 
-async function uploadObject(file: File, extension: string) {
-  const objectPath = `${crypto.randomUUID()}.${extension}`;
+async function uploadObject(file: File, extension: string, presentation = false) {
+  const objectPath = `${presentation ? PRESENTATION_PREFIX : ""}${crypto.randomUUID()}.${extension}`;
   const { error } = await admin.storage.from(BUCKET).upload(objectPath, file, {
     upsert: false,
     contentType: file.type,
@@ -176,13 +201,23 @@ async function logChange(documentId: string, action: string, details: Record<str
   if (error) throw new Error("Registrazione della modifica non riuscita.");
 }
 
-async function uploadDocument(request: Request, payload: Record<string, unknown>) {
+async function uploadDocument(request: Request, payload: Record<string, unknown>, presentation = false) {
   try {
-    const { file, extension } = validateFile(payload.file);
-    const title = cleanString(payload.title, 300, true);
-    const description = cleanString(payload.description, 2000);
-    const visibility = payload.visibility === "tutti" ? "tutti" : "orientatore";
-    const objectPath = await uploadObject(file, extension);
+    const { file, extension } = validateFile(payload.file, presentation);
+    const title = presentation ? PRESENTATION_TITLE : cleanString(payload.title, 300, true);
+    const description = presentation ? PRESENTATION_DESCRIPTION : cleanString(payload.description, 2000);
+    const visibility = presentation ? "tutti" : payload.visibility === "tutti" ? "tutti" : "orientatore";
+    if (presentation) {
+      const { data: existing, error: existingError } = await admin
+        .from("orientamento_documenti")
+        .select("id")
+        .like("object_path", `${PRESENTATION_PREFIX}%`)
+        .eq("attivo", true)
+        .limit(1);
+      if (existingError) throw new Error("Verifica della presentazione non riuscita.");
+      if (existing?.length) throw new Error("La presentazione è già presente: usa Sostituisci.");
+    }
+    const objectPath = await uploadObject(file, extension, presentation);
 
     const { data: document, error: documentError } = await admin
       .from("orientamento_documenti")
@@ -224,11 +259,11 @@ async function uploadDocument(request: Request, payload: Record<string, unknown>
   }
 }
 
-async function replaceDocument(request: Request, payload: Record<string, unknown>) {
+async function replaceDocument(request: Request, payload: Record<string, unknown>, presentation = false) {
   try {
     const documentId = cleanString(payload.document_id, 50, true);
     if (!/^[0-9a-f-]{36}$/i.test(documentId)) throw new Error("Documento non valido.");
-    const { file, extension } = validateFile(payload.file);
+    const { file, extension } = validateFile(payload.file, presentation);
     const { data: current, error: currentError } = await admin
       .from("orientamento_documenti")
       .select("id,versione,object_path")
@@ -236,8 +271,11 @@ async function replaceDocument(request: Request, payload: Record<string, unknown
       .eq("attivo", true)
       .maybeSingle();
     if (currentError || !current) throw new Error("Documento non disponibile.");
+    if (presentation !== current.object_path.startsWith(PRESENTATION_PREFIX)) {
+      throw new Error("Il tipo di documento non corrisponde.");
+    }
 
-    const objectPath = await uploadObject(file, extension);
+    const objectPath = await uploadObject(file, extension, presentation);
     const nextVersion = current.versione + 1;
     const { error: updateError } = await admin
       .from("orientamento_documenti")
@@ -276,6 +314,32 @@ async function replaceDocument(request: Request, payload: Record<string, unknown
   } catch (error) {
     return json(request, { error: error instanceof Error ? error.message : "Sostituzione non riuscita." }, 400);
   }
+}
+
+async function viewPresentation(
+  request: Request,
+  payload: Record<string, unknown>,
+  accessLevel: "orientatore" | "supporter",
+) {
+  const documentId = typeof payload.document_id === "string" ? payload.document_id : "";
+  if (!/^[0-9a-f-]{36}$/i.test(documentId)) return json(request, { error: "Presentazione non valida." }, 400);
+  const { data: document, error } = await admin
+    .from("orientamento_documenti")
+    .select("object_path,visibilita")
+    .eq("id", documentId)
+    .eq("attivo", true)
+    .maybeSingle();
+  if (error || !document || !document.object_path.startsWith(PRESENTATION_PREFIX)) {
+    return json(request, { error: "Presentazione non disponibile." }, 404);
+  }
+  if (accessLevel === "supporter" && document.visibilita !== "tutti") {
+    return json(request, { error: "Accesso non consentito." }, 403);
+  }
+  const { data: file, error: downloadError } = await admin.storage.from(BUCKET).download(document.object_path);
+  if (downloadError || !file || file.size > MAX_PRESENTATION_SIZE) {
+    return json(request, { error: "Impossibile aprire la presentazione." }, 500);
+  }
+  return json(request, { html: await file.text() });
 }
 
 async function updateDocument(request: Request, payload: Record<string, unknown>) {
@@ -350,11 +414,14 @@ Deno.serve(async (request: Request) => {
   if (!session) return json(request, { error: "Sessione scaduta. Accedi di nuovo." }, 401);
   if (action === "session") return json(request, { ok: true, access_level: session.accessLevel });
   if (action === "list") return await listDocuments(request, session.accessLevel);
-  if (["upload", "replace", "update", "archive"].includes(action) && session.accessLevel !== "orientatore") {
+  if (action === "view_presentation") return await viewPresentation(request, payload, session.accessLevel);
+  if (["upload", "replace", "upload_presentation", "replace_presentation", "update", "archive"].includes(action) && session.accessLevel !== "orientatore") {
     return json(request, { error: "Questa password consente soltanto la consultazione." }, 403);
   }
   if (action === "upload") return await uploadDocument(request, payload);
   if (action === "replace") return await replaceDocument(request, payload);
+  if (action === "upload_presentation") return await uploadDocument(request, payload, true);
+  if (action === "replace_presentation") return await replaceDocument(request, payload, true);
   if (action === "update") return await updateDocument(request, payload);
   if (action === "archive") return await archiveDocument(request, payload);
   if (action === "logout") {
