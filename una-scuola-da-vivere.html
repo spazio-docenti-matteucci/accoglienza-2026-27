@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="description" content="Disponibilità dei docenti per l'orientamento della sede Mattei di Decimomannu.">
+  <title>Una scuola da vivere | Orientamento Mattei</title>
+  <link rel="stylesheet" href="portal.css?v=20260922-2">
+  <link rel="stylesheet" href="una-scuola-da-vivere.css?v=20260922-1">
+</head>
+<body>
+  <header class="site-header">
+    <a class="site-brand" href="index.html" aria-label="Torna alla pagina iniziale">
+      <span class="brandmark" aria-hidden="true">M</span>
+      <span><strong>Sede Mattei · Decimomannu</strong><small>Accoglienza e orientamento</small></span>
+    </a>
+    <nav class="page-nav" aria-label="Navigazione principale">
+      <a href="index.html">Home</a>
+      <a href="orientamento.html">Commissione Orientamento</a>
+    </nav>
+  </header>
+
+  <main class="support-main">
+    <section class="support-hero">
+      <p class="eyebrow">Campagna di orientamento 2026/27 · Docenti</p>
+      <h1>Una scuola<br><span>da vivere</span></h1>
+      <p>La sede Mattei incontra le scuole del territorio e apre i propri spazi a laboratori e lezioni. Qui puoi dare la tua disponibilità o proporre un’attività.</p>
+      <div class="hero-actions">
+        <a href="#scuole">Affianca l’orientamento nelle scuole <span aria-hidden="true">→</span></a>
+        <a href="#mattinee">Proponi una Mattinée diffusa <span aria-hidden="true">→</span></a>
+      </div>
+    </section>
+
+    <p class="support-intro">In questa fase raccogliamo disponibilità e proposte. La Commissione Orientamento definirà successivamente assegnazioni, date e orari.</p>
+
+    <section class="support-section" id="scuole" aria-labelledby="scuole-title">
+      <div class="support-heading"><span class="section-number">01</span><div><p class="eyebrow">Presenza sul territorio</p><h2 id="scuole-title">Affianca l’orientamento in una scuola</h2><p>Scegli fino a cinque scuole nelle quali sei disponibile ad accompagnare le attività di orientamento. La scelta esprime una disponibilità, non un’assegnazione già confermata.</p></div></div>
+      <form id="supporterForm" class="support-form" novalidate>
+        <div class="form-grid">
+          <label>Nome <input name="nome" autocomplete="given-name" maxlength="80" required></label>
+          <label>Cognome <input name="cognome" autocomplete="family-name" maxlength="80" required></label>
+        </div>
+        <fieldset class="school-fieldset">
+          <legend>Scuole in cui puoi dare una mano <span class="optional">massimo cinque</span></legend>
+          <p class="school-help">Le denominazioni provengono dall’elenco operativo della campagna e saranno confermate dalla Commissione.</p>
+          <div id="schoolChoices" class="school-choices"></div>
+          <p id="schoolError" class="field-error" role="alert" hidden>Seleziona almeno una scuola, fino a un massimo di cinque.</p>
+        </fieldset>
+        <label>Nota sulla tua disponibilità <span class="optional">facoltativa</span>
+          <textarea name="nota" rows="3" maxlength="600" placeholder="Per esempio: conosco già questa scuola o posso accompagnare un collega."></textarea>
+        </label>
+        <label class="website-trap" aria-hidden="true">Sito web <input name="website" tabindex="-1" autocomplete="off"></label>
+        <div class="form-footer"><p>Il tuo nome e le tue scelte saranno visibili alla Commissione Orientamento, non nell’elenco pubblico delle scuole.</p><button type="submit">Invia disponibilità</button></div>
+        <p class="form-message" id="supporterMessage" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section class="support-section accent-section" id="mattinee" aria-labelledby="mattinee-title">
+      <div class="support-heading"><span class="section-number">02</span><div><p class="eyebrow">La scuola si apre</p><h2 id="mattinee-title">Proponi una Mattinée diffusa</h2><p>Un laboratorio, una lezione aperta o un’esperienza concreta per far conoscere ai ragazzi la vita della sede Mattei. La Commissione valuterà la proposta prima di programmare l’attività.</p></div></div>
+      <form id="proposalForm" class="support-form" novalidate>
+        <div class="form-grid">
+          <label>Nome del docente <input name="nome" autocomplete="given-name" maxlength="80" required></label>
+          <label>Cognome del docente <input name="cognome" autocomplete="family-name" maxlength="80" required></label>
+        </div>
+        <label>Titolo dell’attività <input name="titolo" maxlength="160" required placeholder="Un titolo breve e concreto"></label>
+        <div class="form-grid">
+          <label>Indirizzo o area disciplinare <input name="area" maxlength="120" required placeholder="Per esempio: Turismo, SSAS, Informatica"></label>
+          <label>Tipologia
+            <select name="tipologia" required>
+              <option value="">Seleziona</option>
+              <option value="laboratorio">Laboratorio</option>
+              <option value="lezione_aperta">Lezione aperta</option>
+              <option value="esperienza_pratica">Esperienza pratica</option>
+              <option value="dimostrazione">Dimostrazione</option>
+              <option value="interdisciplinare">Attività interdisciplinare</option>
+              <option value="altro">Altro</option>
+            </select>
+          </label>
+        </div>
+        <label>Che cosa faranno concretamente i ragazzi?
+          <textarea name="descrizione" rows="4" minlength="10" maxlength="1200" required></textarea>
+        </label>
+        <div class="form-grid">
+          <label>Durata indicativa
+            <select name="durata_minuti" required>
+              <option value="">Seleziona</option><option value="30">30 minuti</option><option value="45">45 minuti</option><option value="60">60 minuti</option><option value="90">90 minuti</option>
+            </select>
+          </label>
+          <label>Partecipanti indicativi <span class="optional">facoltativo</span><input name="partecipanti" type="number" min="1" max="200" inputmode="numeric"></label>
+        </div>
+        <label>Spazi o attrezzature necessari <span class="optional">facoltativo</span><textarea name="esigenze" rows="2" maxlength="600"></textarea></label>
+        <label>Note <span class="optional">facoltative</span><textarea name="nota" rows="2" maxlength="600"></textarea></label>
+        <label class="website-trap" aria-hidden="true">Sito web <input name="website" tabindex="-1" autocomplete="off"></label>
+        <div class="form-footer"><p>La proposta sarà visibile alla Commissione Orientamento. Nessuna data viene fissata con questo invio.</p><button type="submit">Invia proposta</button></div>
+        <p class="form-message" id="proposalMessage" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <aside class="coordination-note"><strong>Coordinamento</strong><span>Prof. Salvatore Picconi · Commissione Orientamento</span></aside>
+  </main>
+
+  <footer class="site-footer"><p>I.I.S. A. Meucci – E. Mattei · Sede Mattei, Decimomannu</p><p>Questo spazio non sostituisce il sito istituzionale della scuola.</p></footer>
+  <script src="una-scuola-da-vivere.js?v=20260922-1"></script>
+</body>
+</html>

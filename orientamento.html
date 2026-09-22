@@ -7,6 +7,7 @@
   <meta name="description" content="Area riservata ai docenti della Commissione Orientamento della sede Mattei di Decimomannu.">
   <title>Commissione Orientamento | Area riservata</title>
   <link rel="stylesheet" href="portal.css?v=20260922-2">
+  <link rel="stylesheet" href="orientamento-modulo.css?v=20260922-1">
 </head>
 <body>
   <header class="site-header">
@@ -26,6 +27,7 @@
       <p class="eyebrow">Area docenti · Accesso riservato</p>
       <h1>Commissione<br>Orientamento</h1>
       <p>Presentazione dell’analisi demografica per l’orientamento della sede di Decimomannu.</p>
+      <a class="supporter-page-link" href="una-scuola-da-vivere.html">Una scuola da vivere · Disponibilità e proposte dei docenti <span aria-hidden="true">→</span></a>
     </section>
 
     <section class="protected-shell" aria-labelledby="access-title">
@@ -52,6 +54,17 @@
 
         <div class="documents-heading"><p class="step">Presentazione</p><h3>Popolazione residente e coorti 2008–2013</h3></div>
         <div class="resource-grid" id="resourceGrid"></div>
+
+        <section class="contribution-panel" id="contributionPanel" aria-labelledby="contributionTitle" hidden>
+          <div class="contribution-heading"><div><p class="step">Una scuola da vivere</p><h3 id="contributionTitle">Disponibilità e Mattinée diffuse</h3><p>I nomi dei docenti e le proposte sono visibili solo nell’area di gestione della Commissione.</p></div><button id="refreshContributions" type="button">Aggiorna</button></div>
+          <p id="contributionMessage" role="status" aria-live="polite"></p>
+          <div class="contribution-summary" id="contributionSummary"></div>
+          <details class="coverage-details"><summary>Copertura delle scuole</summary><div class="coverage-grid" id="coverageGrid"></div></details>
+          <div class="contribution-columns">
+            <section aria-labelledby="supporterListTitle"><h4 id="supporterListTitle">Supporter per le scuole</h4><div id="supporterList" class="contribution-list"></div></section>
+            <section aria-labelledby="proposalListTitle"><h4 id="proposalListTitle">Proposte di laboratori e lezioni aperte</h4><div id="proposalList" class="contribution-list"></div></section>
+          </div>
+        </section>
       </div>
     </section>
   </main>
@@ -66,6 +79,6 @@
     <p>I.I.S. A. Meucci – E. Mattei · Sede Mattei, Decimomannu</p>
     <p>Questo spazio non sostituisce il sito istituzionale della scuola.</p>
   </footer>
-  <script src="orientamento.js?v=20260922-2"></script>
+  <script src="orientamento.js?v=20260922-3"></script>
 </body>
 </html>

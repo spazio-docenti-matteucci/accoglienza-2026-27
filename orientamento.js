@@ -14,6 +14,13 @@ const presentationFrame = document.getElementById('presentationFrame');
 const presentationViewerTitle = document.getElementById('presentationViewerTitle');
 const presentationViewerMessage = document.getElementById('presentationViewerMessage');
 const closePresentationButton = document.getElementById('closePresentation');
+const contributionPanel = document.getElementById('contributionPanel');
+const contributionMessage = document.getElementById('contributionMessage');
+const contributionSummary = document.getElementById('contributionSummary');
+const coverageGrid = document.getElementById('coverageGrid');
+const supporterList = document.getElementById('supporterList');
+const proposalList = document.getElementById('proposalList');
+const refreshContributionsButton = document.getElementById('refreshContributions');
 
 let sessionToken = sessionStorage.getItem(SESSION_KEY) || '';
 let accessLevel = '';
@@ -51,6 +58,7 @@ function setAuthenticated(level) {
   workspacePanel.hidden = false;
   roleBadge.textContent = level === 'orientatore' ? 'Orientatore' : 'Componente';
   roleBadge.className = `role-badge ${level}`;
+  contributionPanel.hidden = level !== 'orientatore';
   document.getElementById('workspaceTitle').focus({ preventScroll: true });
 }
 
@@ -60,6 +68,11 @@ function resetSession() {
   accessLevel = '';
   sessionStorage.removeItem(SESSION_KEY);
   resourceGrid.replaceChildren();
+  contributionPanel.hidden = true;
+  contributionSummary.replaceChildren();
+  coverageGrid.replaceChildren();
+  supporterList.replaceChildren();
+  proposalList.replaceChildren();
   workspacePanel.hidden = true;
   loginPanel.hidden = false;
 }
@@ -151,6 +164,139 @@ async function loadDocuments() {
   }
 }
 
+function contributionText(label, value) {
+  const line = document.createElement('p');
+  const strong = document.createElement('strong');
+  strong.textContent = `${label}: `;
+  line.append(strong, document.createTextNode(value || '—'));
+  return line;
+}
+
+function statusControl(kind, item, options) {
+  const label = document.createElement('label');
+  label.className = 'contribution-status';
+  label.textContent = 'Stato';
+  const select = document.createElement('select');
+  for (const [value, text] of options) {
+    const option = document.createElement('option');
+    option.value = value;
+    option.textContent = text;
+    select.append(option);
+  }
+  select.value = item.stato;
+  select.addEventListener('change', async () => {
+    const previous = item.stato;
+    select.disabled = true;
+    contributionMessage.textContent = 'Salvataggio in corso…';
+    try {
+      await api('update_contribution', { kind, id: item.id, stato: select.value });
+      item.stato = select.value;
+      contributionMessage.textContent = 'Stato aggiornato.';
+      await loadContributions();
+    } catch (error) {
+      select.value = previous;
+      contributionMessage.textContent = error.message;
+      if (error.status === 401) resetSession();
+    } finally {
+      select.disabled = false;
+    }
+  });
+  label.append(select);
+  return label;
+}
+
+function renderContributions(data) {
+  const schoolNames = new Map(data.scuole.map((school) => [school.id, `${school.comune} · ${school.etichetta}`]));
+  contributionSummary.replaceChildren();
+  for (const [value, label] of [
+    [data.scuole.length, 'scuole e sedi nell’elenco'],
+    [data.disponibilita.length, 'disponibilità ricevute'],
+    [data.proposte.length, 'proposte Mattinée diffuse'],
+  ]) {
+    const metric = document.createElement('div');
+    const number = document.createElement('strong');
+    number.textContent = String(value);
+    const caption = document.createElement('span');
+    caption.textContent = label;
+    metric.append(number, caption);
+    contributionSummary.append(metric);
+  }
+
+  coverageGrid.replaceChildren();
+  for (const school of data.scuole) {
+    const matches = data.disponibilita.filter((item) => item.stato !== 'archiviata' && item.scuole.includes(school.id));
+    const assigned = matches.some((item) => item.stato === 'assegnata');
+    const card = document.createElement('div');
+    card.className = `coverage-card ${assigned ? 'assigned' : matches.length ? 'offered' : ''}`;
+    const title = document.createElement('strong');
+    title.textContent = `${school.comune} · ${school.etichetta}`;
+    const state = document.createElement('span');
+    state.textContent = assigned ? 'Supporter assegnato' : matches.length ? `${matches.length} disponibilità` : 'Nessuna disponibilità';
+    card.append(title, state);
+    coverageGrid.append(card);
+  }
+
+  supporterList.replaceChildren();
+  if (!data.disponibilita.length) supporterList.textContent = 'Nessuna disponibilità ricevuta.';
+  for (const item of data.disponibilita) {
+    const card = document.createElement('article');
+    card.className = 'contribution-card';
+    const title = document.createElement('h5');
+    title.textContent = `${item.nome} ${item.cognome}`;
+    const meta = document.createElement('small');
+    meta.textContent = `${formatDate(item.created_at)} · Codice ${item.id.slice(0, 8).toUpperCase()}`;
+    card.append(title, meta,
+      contributionText('Scuole', item.scuole.map((id) => schoolNames.get(id) || id).join('; ')));
+    if (item.nota) card.append(contributionText('Nota', item.nota));
+    card.append(statusControl('supporter', item, [
+      ['ricevuta', 'Disponibilità ricevuta'], ['assegnata', 'Supporter assegnato'], ['archiviata', 'Archiviata'],
+    ]));
+    supporterList.append(card);
+  }
+
+  proposalList.replaceChildren();
+  if (!data.proposte.length) proposalList.textContent = 'Nessuna proposta ricevuta.';
+  const types = { laboratorio: 'Laboratorio', lezione_aperta: 'Lezione aperta', esperienza_pratica: 'Esperienza pratica', dimostrazione: 'Dimostrazione', interdisciplinare: 'Attività interdisciplinare', altro: 'Altro' };
+  for (const item of data.proposte) {
+    const card = document.createElement('article');
+    card.className = 'contribution-card';
+    const title = document.createElement('h5');
+    title.textContent = item.titolo;
+    const meta = document.createElement('small');
+    meta.textContent = `${item.nome} ${item.cognome} · ${formatDate(item.created_at)} · Codice ${item.id.slice(0, 8).toUpperCase()}`;
+    card.append(title, meta,
+      contributionText('Area', item.area),
+      contributionText('Tipologia e durata', `${types[item.tipologia] || item.tipologia} · ${item.durata_minuti} minuti`),
+      contributionText('Attività', item.descrizione));
+    if (item.partecipanti) card.append(contributionText('Partecipanti indicativi', String(item.partecipanti)));
+    if (item.esigenze) card.append(contributionText('Spazi e attrezzature', item.esigenze));
+    if (item.nota) card.append(contributionText('Note', item.nota));
+    card.append(statusControl('proposta', item, [
+      ['ricevuta', 'Proposta ricevuta'], ['in_valutazione', 'In valutazione'],
+      ['approvata', 'Approvata'], ['archiviata', 'Archiviata'],
+    ]));
+    proposalList.append(card);
+  }
+}
+
+async function loadContributions() {
+  if (accessLevel !== 'orientatore') return;
+  refreshContributionsButton.disabled = true;
+  contributionMessage.textContent = 'Caricamento delle disponibilità…';
+  try {
+    const data = await api('list_contributions');
+    renderContributions(data);
+    contributionMessage.textContent = '';
+  } catch (error) {
+    contributionMessage.textContent = error.message;
+    if (error.status === 401) resetSession();
+  } finally {
+    refreshContributionsButton.disabled = false;
+  }
+}
+
+refreshContributionsButton.addEventListener('click', loadContributions);
+
 passwordForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   const submitButton = passwordForm.querySelector('button');
@@ -163,7 +309,7 @@ passwordForm.addEventListener('submit', async (event) => {
     passwordInput.value = '';
     accessMessage.textContent = '';
     setAuthenticated(result.access_level);
-    await loadDocuments();
+    await Promise.all([loadDocuments(), loadContributions()]);
   } catch (error) {
     accessMessage.textContent = error.message;
     passwordInput.select();
@@ -187,7 +333,7 @@ if (sessionToken) {
   api('session')
     .then(async (result) => {
       setAuthenticated(result.access_level);
-      await loadDocuments();
+      await Promise.all([loadDocuments(), loadContributions()]);
     })
     .catch(() => resetSession());
 }

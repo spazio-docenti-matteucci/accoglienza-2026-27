@@ -19,6 +19,10 @@ const ALLOWED_FILES = new Map([
 ]);
 const MAX_FILE_SIZE = 25 * 1024 * 1024;
 const MAX_PRESENTATION_SIZE = 2 * 1024 * 1024;
+const MAX_JSON_SIZE = 12000;
+const MAX_PUBLIC_REQUESTS_PER_DAY = 8;
+const PROPOSAL_TYPES = new Set(["laboratorio", "lezione_aperta", "esperienza_pratica", "dimostrazione", "interdisciplinare", "altro"]);
+const PROPOSAL_DURATIONS = new Set([30, 45, 60, 90]);
 const ALLOWED_ORIGINS = new Set([
   "https://spazio-docenti-matteucci.github.io",
   "http://localhost:8765",
@@ -163,6 +167,120 @@ function cleanString(value: unknown, maxLength: number, required = false) {
   if (required && !cleaned) throw new Error("Campo obbligatorio mancante.");
   if (cleaned.length > maxLength) throw new Error("Uno dei testi supera la lunghezza consentita.");
   return cleaned;
+}
+
+function publicText(value: unknown, minLength: number, maxLength: number) {
+  if (typeof value !== "string") throw new Error("Controlla i campi obbligatori.");
+  const cleaned = value.trim().replace(/\s+/g, " ");
+  if (cleaned.length < minLength || cleaned.length > maxLength) {
+    throw new Error("Controlla la lunghezza dei campi compilati.");
+  }
+  return cleaned;
+}
+
+function publicName(value: unknown) {
+  const name = publicText(value, 2, 80);
+  if (!/^[\p{L}\p{M}\s'.’-]+$/u.test(name)) throw new Error("Inserisci nome e cognome validi.");
+  return name;
+}
+
+function confirmationCode(id: string) {
+  return id.slice(0, 8).toUpperCase();
+}
+
+class PublicServiceError extends Error {
+  constructor() { super("Il modulo non è disponibile. Riprova più tardi."); }
+}
+
+async function publicQuota(request: Request) {
+  const ip = request.headers.get("cf-connecting-ip") ?? request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const day = new Date().toISOString().slice(0, 10);
+  const fingerprint = await sha256(`${day}:${ip}:${serviceRoleKey}`);
+  const { data, error } = await admin.rpc("orientamento_consuma_quota", {
+    p_fingerprint: fingerprint,
+    p_limite: MAX_PUBLIC_REQUESTS_PER_DAY,
+  });
+  if (error) throw new PublicServiceError();
+  return data === true;
+}
+
+async function submitSupporter(request: Request, payload: Record<string, unknown>) {
+  try {
+    if (payload.website) return json(request, { ok: true, codice: "RICEVUTA" });
+    const nome = publicName(payload.nome);
+    const cognome = publicName(payload.cognome);
+    const scuole = payload.scuole;
+    if (!Array.isArray(scuole) || scuole.length < 1 || scuole.length > 5 ||
+      scuole.some((id) => typeof id !== "string" || !/^[a-z0-9-]{3,80}$/.test(id)) ||
+      new Set(scuole).size !== scuole.length) {
+      throw new Error("Seleziona da una a cinque scuole.");
+    }
+    const nota = publicText(payload.nota ?? "", 0, 600);
+    const { data: valid, error: schoolError } = await admin.from("orientamento_scuole")
+      .select("id").in("id", scuole).eq("attiva", true);
+    if (schoolError) throw new PublicServiceError();
+    if (!valid || valid.length !== scuole.length) throw new Error("L’elenco delle scuole è cambiato. Ricarica la pagina.");
+    if (!await publicQuota(request)) return json(request, { error: "Troppe richieste da questa connessione. Riprova domani." }, 429);
+    const { data, error } = await admin.from("orientamento_disponibilita")
+      .insert({ nome, cognome, scuole, nota }).select("id").single();
+    if (error || !data) throw new PublicServiceError();
+    return json(request, { ok: true, codice: confirmationCode(data.id) }, 201);
+  } catch (error) {
+    return json(request, { error: error instanceof Error ? error.message : "Invio non riuscito." }, error instanceof PublicServiceError ? 503 : 400);
+  }
+}
+
+async function submitProposal(request: Request, payload: Record<string, unknown>) {
+  try {
+    if (payload.website) return json(request, { ok: true, codice: "RICEVUTA" });
+    const nome = publicName(payload.nome);
+    const cognome = publicName(payload.cognome);
+    const titolo = publicText(payload.titolo, 3, 160);
+    const area = publicText(payload.area, 2, 120);
+    const descrizione = publicText(payload.descrizione, 10, 1200);
+    const esigenze = publicText(payload.esigenze ?? "", 0, 600);
+    const nota = publicText(payload.nota ?? "", 0, 600);
+    if (typeof payload.tipologia !== "string" || !PROPOSAL_TYPES.has(payload.tipologia)) throw new Error("Seleziona una tipologia di attività.");
+    if (typeof payload.durata_minuti !== "number" || !PROPOSAL_DURATIONS.has(payload.durata_minuti)) throw new Error("Seleziona una durata indicativa.");
+    const partecipanti = payload.partecipanti === null || payload.partecipanti === "" || payload.partecipanti === undefined ? null : payload.partecipanti;
+    if (partecipanti !== null && (!Number.isInteger(partecipanti) || partecipanti < 1 || partecipanti > 200)) {
+      throw new Error("Il numero di partecipanti non è valido.");
+    }
+    if (!await publicQuota(request)) return json(request, { error: "Troppe richieste da questa connessione. Riprova domani." }, 429);
+    const { data, error } = await admin.from("orientamento_proposte")
+      .insert({ nome, cognome, titolo, area, tipologia: payload.tipologia, descrizione,
+        durata_minuti: payload.durata_minuti, partecipanti, esigenze, nota })
+      .select("id").single();
+    if (error || !data) throw new PublicServiceError();
+    return json(request, { ok: true, codice: confirmationCode(data.id) }, 201);
+  } catch (error) {
+    return json(request, { error: error instanceof Error ? error.message : "Invio non riuscito." }, error instanceof PublicServiceError ? 503 : 400);
+  }
+}
+
+async function listContributions(request: Request) {
+  const [schools, supporter, proposals] = await Promise.all([
+    admin.from("orientamento_scuole").select("id,comune,etichetta,area,verificata").eq("attiva", true).order("ordine"),
+    admin.from("orientamento_disponibilita").select("id,nome,cognome,scuole,nota,stato,created_at").order("created_at", { ascending: false }).limit(500),
+    admin.from("orientamento_proposte").select("id,nome,cognome,titolo,area,tipologia,descrizione,durata_minuti,partecipanti,esigenze,nota,stato,created_at").order("created_at", { ascending: false }).limit(500),
+  ]);
+  if (schools.error || supporter.error || proposals.error) return json(request, { error: "Impossibile caricare le disponibilità." }, 500);
+  return json(request, { scuole: schools.data, disponibilita: supporter.data, proposte: proposals.data });
+}
+
+async function updateContribution(request: Request, payload: Record<string, unknown>) {
+  const kind = payload.kind;
+  const id = payload.id;
+  const state = payload.stato;
+  if (typeof id !== "string" || !/^[0-9a-f-]{36}$/i.test(id)) return json(request, { error: "Voce non valida." }, 400);
+  const allowed = kind === "supporter" ? ["ricevuta", "assegnata", "archiviata"] :
+    kind === "proposta" ? ["ricevuta", "in_valutazione", "approvata", "archiviata"] : [];
+  if (typeof state !== "string" || !allowed.includes(state)) return json(request, { error: "Stato non valido." }, 400);
+  const table = kind === "supporter" ? "orientamento_disponibilita" : "orientamento_proposte";
+  const { data, error } = await admin.from(table).update({ stato: state, updated_at: new Date().toISOString() })
+    .eq("id", id).select("id").maybeSingle();
+  if (error || !data) return json(request, { error: "Aggiornamento non riuscito." }, 500);
+  return json(request, { ok: true });
 }
 
 function validateFile(value: unknown, presentation = false) {
@@ -401,7 +519,11 @@ Deno.serve(async (request: Request) => {
     if ((request.headers.get("content-type") ?? "").includes("multipart/form-data")) {
       payload = Object.fromEntries((await request.formData()).entries());
     } else {
-      payload = await request.json();
+      const body = await request.text();
+      if (body.length > MAX_JSON_SIZE) return json(request, { error: "Richiesta troppo grande." }, 413);
+      const parsed = JSON.parse(body);
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return json(request, { error: "Richiesta non valida." }, 400);
+      payload = parsed;
     }
   } catch {
     return json(request, { error: "Richiesta non valida." }, 400);
@@ -409,12 +531,19 @@ Deno.serve(async (request: Request) => {
 
   const action = typeof payload.action === "string" ? payload.action : "";
   if (action === "login") return await login(request, payload);
+  if (action === "submit_supporter") return await submitSupporter(request, payload);
+  if (action === "submit_proposal") return await submitProposal(request, payload);
 
   const session = await verifySession(request);
   if (!session) return json(request, { error: "Sessione scaduta. Accedi di nuovo." }, 401);
   if (action === "session") return json(request, { ok: true, access_level: session.accessLevel });
   if (action === "list") return await listDocuments(request, session.accessLevel);
   if (action === "view_presentation") return await viewPresentation(request, payload, session.accessLevel);
+  if (["list_contributions", "update_contribution"].includes(action) && session.accessLevel !== "orientatore") {
+    return json(request, { error: "Accesso riservato alla Commissione Orientamento." }, 403);
+  }
+  if (action === "list_contributions") return await listContributions(request);
+  if (action === "update_contribution") return await updateContribution(request, payload);
   if (["upload", "replace", "upload_presentation", "replace_presentation", "update", "archive"].includes(action) && session.accessLevel !== "orientatore") {
     return json(request, { error: "Questa password consente soltanto la consultazione." }, 403);
   }

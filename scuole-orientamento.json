@@ -1,0 +1,170 @@
+[
+  {
+    "id": "assemini-nivola",
+    "comune": "Assemini",
+    "etichetta": "Nivola",
+    "area": "bacino",
+    "ordine": 10
+  },
+  {
+    "id": "assemini-pascoli",
+    "comune": "Assemini",
+    "etichetta": "Pascoli",
+    "area": "bacino",
+    "ordine": 20
+  },
+  {
+    "id": "decimomannu-da-vinci",
+    "comune": "Decimomannu",
+    "etichetta": "L. Da Vinci",
+    "area": "bacino",
+    "ordine": 30
+  },
+  {
+    "id": "decimoputzu-gramsci",
+    "comune": "Decimoputzu",
+    "etichetta": "A. Gramsci",
+    "area": "bacino",
+    "ordine": 40
+  },
+  {
+    "id": "elmas-saba",
+    "comune": "Elmas",
+    "etichetta": "Monsignor Saba",
+    "area": "bacino",
+    "ordine": 50
+  },
+  {
+    "id": "samassi-fermi",
+    "comune": "Samassi",
+    "etichetta": "E. Fermi",
+    "area": "bacino",
+    "ordine": 60
+  },
+  {
+    "id": "san-sperate-deledda",
+    "comune": "San Sperate",
+    "etichetta": "G. Deledda",
+    "area": "bacino",
+    "ordine": 70
+  },
+  {
+    "id": "serramanna-sede",
+    "comune": "Serramanna",
+    "etichetta": "Scuola secondaria di I grado",
+    "area": "bacino",
+    "ordine": 80
+  },
+  {
+    "id": "siliqua-sede",
+    "comune": "Siliqua",
+    "etichetta": "Scuola secondaria di I grado",
+    "area": "bacino",
+    "ordine": 90
+  },
+  {
+    "id": "uta-sede",
+    "comune": "Uta",
+    "etichetta": "Scuola secondaria di I grado",
+    "area": "bacino",
+    "ordine": 100
+  },
+  {
+    "id": "vallermosa-sede",
+    "comune": "Vallermosa",
+    "etichetta": "Scuola secondaria di I grado",
+    "area": "bacino",
+    "ordine": 110
+  },
+  {
+    "id": "villasor-pusceddu",
+    "comune": "Villasor",
+    "etichetta": "Pusceddu",
+    "area": "bacino",
+    "ordine": 120
+  },
+  {
+    "id": "villaspeciosa-sede",
+    "comune": "Villaspeciosa",
+    "etichetta": "Scuola secondaria di I grado",
+    "area": "bacino",
+    "ordine": 130
+  },
+  {
+    "id": "ussana-sede",
+    "comune": "Ussana",
+    "etichetta": "Scuola secondaria di I grado",
+    "area": "bacino",
+    "ordine": 140
+  },
+  {
+    "id": "monastir-sede",
+    "comune": "Monastir",
+    "etichetta": "Scuola secondaria di I grado",
+    "area": "bacino",
+    "ordine": 150
+  },
+  {
+    "id": "capoterra-sede",
+    "comune": "Capoterra",
+    "etichetta": "Scuola secondaria di I grado",
+    "area": "bacino",
+    "ordine": 160
+  },
+  {
+    "id": "sestu-gramsci-rodari",
+    "comune": "Sestu",
+    "etichetta": "I.C. Gramsci-Rodari",
+    "area": "bacino",
+    "ordine": 170
+  },
+  {
+    "id": "villamassargia-meloni",
+    "comune": "Villamassargia",
+    "etichetta": "I.C. F. Meloni",
+    "area": "esterno",
+    "ordine": 180
+  },
+  {
+    "id": "san-gavino-arborea",
+    "comune": "San Gavino",
+    "etichetta": "E. D’Arborea",
+    "area": "esterno",
+    "ordine": 190
+  },
+  {
+    "id": "sardara-sede",
+    "comune": "Sardara",
+    "etichetta": "Scuola secondaria di I grado",
+    "area": "esterno",
+    "ordine": 200
+  },
+  {
+    "id": "sinnai-ic-1-2",
+    "comune": "Sinnai",
+    "etichetta": "I.C. Sinnai 1–2",
+    "area": "esterno",
+    "ordine": 210
+  },
+  {
+    "id": "villacidro-sede",
+    "comune": "Villacidro",
+    "etichetta": "Scuola secondaria di I grado",
+    "area": "esterno",
+    "ordine": 220
+  },
+  {
+    "id": "sanluri-calasanzio",
+    "comune": "Sanluri",
+    "etichetta": "Calasanzio",
+    "area": "esterno",
+    "ordine": 230
+  },
+  {
+    "id": "gonnosfanadiga-sede",
+    "comune": "Gonnosfanadiga",
+    "etichetta": "Scuola secondaria di I grado",
+    "area": "esterno",
+    "ordine": 240
+  }
+]
