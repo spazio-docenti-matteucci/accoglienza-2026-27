@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex, nofollow, noarchive">
   <meta name="description" content="Area riservata ai docenti della Commissione Orientamento della sede Mattei di Decimomannu.">
   <title>Commissione Orientamento | Area riservata</title>
-  <link rel="stylesheet" href="portal.css?v=20260922-1">
+  <link rel="stylesheet" href="portal.css?v=20260922-2">
 </head>
 <body>
   <header class="site-header">
@@ -25,7 +25,7 @@
       <a class="back-link" href="index.html"><span aria-hidden="true">←</span> Torna alla scelta</a>
       <p class="eyebrow">Area docenti · Accesso riservato</p>
       <h1>Commissione<br>Orientamento</h1>
-      <p>Documenti e materiali di lavoro condivisi esclusivamente con i docenti della commissione.</p>
+      <p>Presentazione dell’analisi demografica per l’orientamento della sede di Decimomannu.</p>
     </section>
 
     <section class="protected-shell" aria-labelledby="access-title">
@@ -46,37 +46,11 @@
 
       <div class="workspace-panel" id="workspacePanel" hidden>
         <div class="workspace-heading">
-          <div><p class="step">Commissione Orientamento</p><h2 id="workspaceTitle" tabindex="-1">Materiali condivisi</h2></div>
+          <div><p class="step">Commissione Orientamento</p><h2 id="workspaceTitle" tabindex="-1">Analisi del bacino di Decimomannu</h2></div>
           <div class="workspace-session"><span class="role-badge" id="roleBadge"></span><button class="logout-button" id="logoutButton" type="button">Esci</button></div>
         </div>
 
-        <section class="upload-panel" id="uploadPanel" aria-labelledby="upload-title">
-          <div><p class="step">Nuovo materiale</p><h3 id="upload-title">Carica un documento</h3></div>
-          <form class="upload-form" id="uploadForm">
-            <label>Titolo<input name="title" type="text" maxlength="300" required></label>
-            <label>Descrizione<textarea name="description" rows="3" maxlength="2000"></textarea></label>
-            <label>Chi può vederlo?
-              <select name="visibility">
-                <option value="orientatore">Solo i tre orientatori</option>
-                <option value="tutti">Tutti i componenti</option>
-              </select>
-            </label>
-            <label>File<input name="file" type="file" accept=".pdf,.docx,.xlsx,.pptx,.png,.jpg,.jpeg,.txt" required></label>
-            <button type="submit">Carica nell’area riservata</button>
-            <p class="upload-message" id="uploadMessage" role="status" aria-live="polite"></p>
-          </form>
-        </section>
-
-        <section class="upload-panel" id="presentationUploadPanel" aria-labelledby="presentation-upload-title" hidden>
-          <div><p class="step">Analisi del bacino</p><h3 id="presentation-upload-title">Aggiorna la presentazione</h3></div>
-          <form class="upload-form" id="presentationUploadForm">
-            <label>Presentazione HTML<input name="file" type="file" accept=".html,text/html" required></label>
-            <button type="submit">Carica la presentazione</button>
-            <p class="upload-message" id="presentationUploadMessage" role="status" aria-live="polite"></p>
-          </form>
-        </section>
-
-        <div class="documents-heading"><p class="step">Archivio attivo</p><h3>Documenti disponibili</h3></div>
+        <div class="documents-heading"><p class="step">Presentazione</p><h3>Popolazione residente e coorti 2008–2013</h3></div>
         <div class="resource-grid" id="resourceGrid"></div>
       </div>
     </section>
@@ -92,6 +66,6 @@
     <p>I.I.S. A. Meucci – E. Mattei · Sede Mattei, Decimomannu</p>
     <p>Questo spazio non sostituisce il sito istituzionale della scuola.</p>
   </footer>
-  <script src="orientamento.js?v=20260922-1"></script>
+  <script src="orientamento.js?v=20260922-2"></script>
 </body>
 </html>

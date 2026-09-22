@@ -8,13 +8,7 @@ const workspacePanel = document.getElementById('workspacePanel');
 const accessMessage = document.getElementById('accessMessage');
 const logoutButton = document.getElementById('logoutButton');
 const resourceGrid = document.getElementById('resourceGrid');
-const uploadPanel = document.getElementById('uploadPanel');
-const uploadForm = document.getElementById('uploadForm');
-const uploadMessage = document.getElementById('uploadMessage');
 const roleBadge = document.getElementById('roleBadge');
-const presentationUploadPanel = document.getElementById('presentationUploadPanel');
-const presentationUploadForm = document.getElementById('presentationUploadForm');
-const presentationUploadMessage = document.getElementById('presentationUploadMessage');
 const presentationViewer = document.getElementById('presentationViewer');
 const presentationFrame = document.getElementById('presentationFrame');
 const presentationViewerTitle = document.getElementById('presentationViewerTitle');
@@ -23,7 +17,6 @@ const closePresentationButton = document.getElementById('closePresentation');
 
 let sessionToken = sessionStorage.getItem(SESSION_KEY) || '';
 let accessLevel = '';
-let presentationId = '';
 
 async function api(action, payload = {}, formData = null) {
   const headers = {};
@@ -56,16 +49,13 @@ function setAuthenticated(level) {
   accessLevel = level;
   loginPanel.hidden = true;
   workspacePanel.hidden = false;
-  uploadPanel.hidden = level !== 'orientatore';
-  presentationUploadPanel.hidden = level !== 'orientatore';
-  roleBadge.textContent = level === 'orientatore' ? 'Accesso completo' : 'Materiali condivisi';
+  roleBadge.textContent = level === 'orientatore' ? 'Orientatore' : 'Componente';
   roleBadge.className = `role-badge ${level}`;
   document.getElementById('workspaceTitle').focus({ preventScroll: true });
 }
 
 function resetSession() {
   closePresentation();
-  presentationId = '';
   sessionToken = '';
   accessLevel = '';
   sessionStorage.removeItem(SESSION_KEY);
@@ -105,51 +95,6 @@ function createActionButton(label, className, handler) {
   return button;
 }
 
-async function replaceFile(item, input, status) {
-  const file = input.files?.[0];
-  if (!file) return;
-  status.textContent = 'Sostituzione in corso…';
-  const formData = new FormData();
-  formData.set('document_id', item.id);
-  formData.set('file', file);
-  try {
-    await api(item.kind === 'presentation' ? 'replace_presentation' : 'replace', {}, formData);
-    status.textContent = 'Nuova versione caricata.';
-    await loadDocuments();
-  } catch (error) {
-    status.textContent = error.message;
-  } finally {
-    input.value = '';
-  }
-}
-
-async function saveDocument(item, titleInput, descriptionInput, visibilitySelect, status) {
-  status.textContent = 'Salvataggio…';
-  try {
-    await api('update', {
-      document_id: item.id,
-      title: titleInput.value,
-      description: descriptionInput.value,
-      visibility: visibilitySelect.value,
-    });
-    status.textContent = 'Modifiche salvate.';
-    await loadDocuments();
-  } catch (error) {
-    status.textContent = error.message;
-  }
-}
-
-async function archiveDocument(item, status) {
-  if (!window.confirm(`Archiviare “${item.title}”? Il file resterà recuperabile.`)) return;
-  status.textContent = 'Archiviazione…';
-  try {
-    await api('archive', { document_id: item.id });
-    await loadDocuments();
-  } catch (error) {
-    status.textContent = error.message;
-  }
-}
-
 function renderDocument(item) {
   const card = document.createElement('article');
   card.className = 'resource-card';
@@ -181,70 +126,28 @@ function renderDocument(item) {
     actions.append(unavailable);
   }
 
-  if (accessLevel === 'orientatore') {
-    const manage = document.createElement('details');
-    manage.className = 'document-manage';
-    const summary = document.createElement('summary');
-    summary.textContent = 'Gestisci';
-
-    const titleInput = document.createElement('input');
-    titleInput.value = item.title;
-    titleInput.maxLength = 300;
-    titleInput.setAttribute('aria-label', 'Titolo del documento');
-    const descriptionInput = document.createElement('textarea');
-    descriptionInput.value = item.description || '';
-    descriptionInput.maxLength = 2000;
-    descriptionInput.rows = 3;
-    descriptionInput.setAttribute('aria-label', 'Descrizione del documento');
-    const visibilitySelect = document.createElement('select');
-    visibilitySelect.setAttribute('aria-label', 'Visibilità del documento');
-    visibilitySelect.innerHTML = '<option value="orientatore">Solo orientatori</option><option value="tutti">Tutti i componenti</option>';
-    visibilitySelect.value = item.visibility;
-
-    const replacementInput = document.createElement('input');
-    replacementInput.type = 'file';
-    replacementInput.accept = item.kind === 'presentation' ? '.html,text/html' : '.pdf,.docx,.xlsx,.pptx,.png,.jpg,.jpeg,.txt';
-    replacementInput.className = 'replacement-input';
-    replacementInput.setAttribute('aria-label', 'Sostituisci il file');
-
-    const status = document.createElement('p');
-    status.className = 'manage-status';
-    status.setAttribute('role', 'status');
-    replacementInput.addEventListener('change', () => replaceFile(item, replacementInput, status));
-
-    const manageActions = document.createElement('div');
-    manageActions.className = 'manage-actions';
-    manageActions.append(
-      createActionButton('Salva dati e accesso', 'save-button', () => saveDocument(item, titleInput, descriptionInput, visibilitySelect, status)),
-      createActionButton('Archivia', 'archive-button', () => archiveDocument(item, status)),
-    );
-    manage.append(summary, titleInput, descriptionInput, visibilitySelect, replacementInput, manageActions, status);
-    actions.append(manage);
-  }
-
   card.append(actions);
   return card;
 }
 
 async function loadDocuments() {
-  resourceGrid.textContent = 'Caricamento dei documenti…';
+  resourceGrid.textContent = 'Caricamento della presentazione…';
   try {
     const result = await api('list');
-    presentationId = result.documents.find((item) => item.kind === 'presentation')?.id || '';
     resourceGrid.replaceChildren();
     if (!result.documents.length) {
       const empty = document.createElement('p');
       empty.className = 'resource-empty';
-      empty.textContent = accessLevel === 'orientatore'
-        ? 'Nessun documento caricato.'
-        : 'Al momento non ci sono materiali condivisi con questo gruppo.';
+      empty.textContent = 'La presentazione non è disponibile.';
       resourceGrid.append(empty);
       return;
     }
     result.documents.forEach((item) => resourceGrid.append(renderDocument(item)));
+    const presentation = result.documents.find((item) => item.kind === 'presentation');
+    if (presentation) await openPresentation(presentation);
   } catch (error) {
     if (error.status === 401) resetSession();
-    accessMessage.textContent = error.message;
+    else resourceGrid.textContent = error.message;
   }
 }
 
@@ -264,42 +167,6 @@ passwordForm.addEventListener('submit', async (event) => {
   } catch (error) {
     accessMessage.textContent = error.message;
     passwordInput.select();
-  } finally {
-    submitButton.disabled = false;
-  }
-});
-
-uploadForm.addEventListener('submit', async (event) => {
-  event.preventDefault();
-  const submitButton = uploadForm.querySelector('button');
-  submitButton.disabled = true;
-  uploadMessage.textContent = 'Caricamento in corso…';
-  try {
-    await api('upload', {}, new FormData(uploadForm));
-    uploadForm.reset();
-    uploadMessage.textContent = 'Documento caricato.';
-    await loadDocuments();
-  } catch (error) {
-    uploadMessage.textContent = error.message;
-  } finally {
-    submitButton.disabled = false;
-  }
-});
-
-presentationUploadForm.addEventListener('submit', async (event) => {
-  event.preventDefault();
-  const submitButton = presentationUploadForm.querySelector('button');
-  submitButton.disabled = true;
-  presentationUploadMessage.textContent = 'Caricamento in corso…';
-  try {
-    const data = new FormData(presentationUploadForm);
-    if (presentationId) data.set('document_id', presentationId);
-    await api(presentationId ? 'replace_presentation' : 'upload_presentation', {}, data);
-    presentationUploadForm.reset();
-    presentationUploadMessage.textContent = 'Presentazione aggiornata.';
-    await loadDocuments();
-  } catch (error) {
-    presentationUploadMessage.textContent = error.message;
   } finally {
     submitButton.disabled = false;
   }
