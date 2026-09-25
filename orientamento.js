@@ -131,20 +131,18 @@ function renderDocument(item) {
 }
 
 async function loadDocuments() {
-  resourceGrid.textContent = 'Caricamento della presentazione…';
+  resourceGrid.textContent = 'Caricamento dei materiali…';
   try {
     const result = await api('list');
     resourceGrid.replaceChildren();
     if (!result.documents.length) {
       const empty = document.createElement('p');
       empty.className = 'resource-empty';
-      empty.textContent = 'La presentazione non è disponibile.';
+      empty.textContent = 'Nessun materiale disponibile.';
       resourceGrid.append(empty);
       return;
     }
     result.documents.forEach((item) => resourceGrid.append(renderDocument(item)));
-    const presentation = result.documents.find((item) => item.kind === 'presentation');
-    if (presentation) await openPresentation(presentation);
   } catch (error) {
     if (error.status === 401) resetSession();
     else resourceGrid.textContent = error.message;
