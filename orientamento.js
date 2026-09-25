@@ -49,7 +49,7 @@ function setAuthenticated(level) {
   accessLevel = level;
   loginPanel.hidden = true;
   workspacePanel.hidden = false;
-  roleBadge.textContent = level === 'orientatore' ? 'Orientatore' : 'Componente';
+  roleBadge.textContent = level === 'funzione_strumentale' ? 'Funzione Strumentale' : level === 'orientatore' ? 'Orientatore' : 'Componente';
   roleBadge.className = `role-badge ${level}`;
   document.getElementById('workspaceTitle').focus({ preventScroll: true });
 }

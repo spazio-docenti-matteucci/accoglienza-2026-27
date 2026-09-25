@@ -107,7 +107,7 @@ main { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
 .workspace-heading .step { color: var(--green); }
 .workspace-session { display: flex; align-items: center; gap: 10px; }
 .role-badge { padding: 8px 11px; border-radius: 99px; font-size: .67rem; font-weight: 900; text-transform: uppercase; }
-.role-badge.orientatore { color: #9d0040; background: #f9e7ef; }
+.role-badge.orientatore, .role-badge.funzione_strumentale { color: #9d0040; background: #f9e7ef; }
 .role-badge.supporter { color: var(--green); background: #e5f5e8; }
 .logout-button { min-height: 42px; padding-inline: 16px; color: var(--navy); background: #e8f1f3; font-size: .75rem; }
 .workspace-intro { max-width: 720px; margin: 0 0 28px; color: var(--muted); line-height: 1.5; }

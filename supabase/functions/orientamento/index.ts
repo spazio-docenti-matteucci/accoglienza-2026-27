@@ -7,7 +7,8 @@ const BUCKET = "orientamento-riservato";
 const PRESENTATION_PREFIX = "presentazioni/";
 const PRESENTATION_TITLE = "Residenti in età di ingresso alla prima superiore · coorti 2008–2013";
 const PRESENTATION_DESCRIPTION = "Analisi demografica dei comuni di provenienza degli iscritti alla sede di Decimomannu dell’IIS Meucci-Mattei. Fonte: ISTAT POSAS.";
-const VALID_LEVELS = new Set(["orientatore", "supporter"]);
+const VALID_LEVELS = new Set(["orientatore", "supporter", "funzione_strumentale"]);
+type AccessLevel = "orientatore" | "supporter" | "funzione_strumentale";
 const ALLOWED_FILES = new Map([
   ["application/pdf", "pdf"],
   ["application/vnd.openxmlformats-officedocument.wordprocessingml.document", "docx"],
@@ -100,7 +101,7 @@ async function verifySession(request: Request) {
     .from("orientamento_sessioni")
     .update({ last_seen_at: new Date().toISOString() })
     .eq("token_hash", tokenHash);
-  return { tokenHash, accessLevel: data.access_level as "orientatore" | "supporter" };
+  return { tokenHash, accessLevel: data.access_level as AccessLevel };
 }
 
 async function login(request: Request, payload: Record<string, unknown>) {
@@ -130,7 +131,7 @@ async function login(request: Request, payload: Record<string, unknown>) {
   return json(request, { ok: true, token, access_level: accessLevel, expires_at: expiresAt });
 }
 
-async function listDocuments(request: Request, accessLevel: "orientatore" | "supporter") {
+async function listDocuments(request: Request, accessLevel: AccessLevel) {
   let query = admin
     .from("orientamento_documenti")
     .select("id,object_path,titolo,descrizione,visibilita,ordine,versione,updated_at")
@@ -638,7 +639,7 @@ async function replaceDocument(request: Request, payload: Record<string, unknown
 async function viewPresentation(
   request: Request,
   payload: Record<string, unknown>,
-  accessLevel: "orientatore" | "supporter",
+  accessLevel: AccessLevel,
 ) {
   const documentId = typeof payload.document_id === "string" ? payload.document_id : "";
   if (!/^[0-9a-f-]{36}$/i.test(documentId)) return json(request, { error: "Presentazione non valida." }, 400);
@@ -741,14 +742,15 @@ Deno.serve(async (request: Request) => {
   if (action === "session") return json(request, { ok: true, access_level: session.accessLevel });
   if (action === "list") return await listDocuments(request, session.accessLevel);
   if (action === "view_presentation") return await viewPresentation(request, payload, session.accessLevel);
-  if (["list_contributions", "update_contribution", "register_activity", "archive_activity"].includes(action) && session.accessLevel !== "orientatore") {
-    return json(request, { error: "Accesso riservato alla Commissione Orientamento." }, 403);
+  // La gestione di candidature, proposte e attività è riservata alla password personale della Funzione Strumentale.
+  if (["list_contributions", "update_contribution", "register_activity", "archive_activity"].includes(action) && session.accessLevel !== "funzione_strumentale") {
+    return json(request, { error: "Accesso riservato alla Funzione Strumentale." }, 403);
   }
   if (action === "list_contributions") return await listContributions(request);
   if (action === "update_contribution") return await updateContribution(request, payload);
   if (action === "register_activity") return await registerActivity(request, payload);
   if (action === "archive_activity") return await archiveActivity(request, payload);
-  if (["upload", "replace", "upload_presentation", "replace_presentation", "update", "archive"].includes(action) && session.accessLevel !== "orientatore") {
+  if (["upload", "replace", "upload_presentation", "replace_presentation", "update", "archive"].includes(action) && session.accessLevel === "supporter") {
     return json(request, { error: "Questa password consente soltanto la consultazione." }, 403);
   }
   if (action === "upload") return await uploadDocument(request, payload);

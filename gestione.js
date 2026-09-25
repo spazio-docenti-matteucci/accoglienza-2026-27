@@ -274,7 +274,7 @@ async function load() {
 
 async function enter() {
   const session = await api('session');
-  if (session.access_level !== 'orientatore') {
+  if (session.access_level !== 'funzione_strumentale') {
     try { await api('logout'); } catch { /* sessione chiusa comunque */ }
     const error = new Error('Questa password non dà accesso alla gestione orientamento.');
     error.status = 403;
