@@ -21,7 +21,7 @@ const ALLOWED_FILES = new Map([
 const MAX_FILE_SIZE = 25 * 1024 * 1024;
 const MAX_PRESENTATION_SIZE = 2 * 1024 * 1024;
 const MAX_JSON_SIZE = 12000;
-const MAX_PUBLIC_REQUESTS_PER_DAY = 8;
+const MAX_PUBLIC_REQUESTS_PER_DAY = 40;
 const PROPOSAL_TYPES = new Set(["laboratorio", "lezione_aperta", "esperienza_pratica", "dimostrazione", "interdisciplinare", "altro"]);
 const PROPOSAL_DURATIONS = new Set([30, 45, 60, 90]);
 const ACTIVITY_TYPES = new Set(["visita", "mattinee"]);
@@ -358,10 +358,16 @@ async function loadScoreData() {
     admin.from("orientamento_scuole").select("id,comune,etichetta,area,verificata").eq("attiva", true).order("ordine"),
     admin.from("orientamento_disponibilita").select("id,nome,cognome,scuole,nota,stato,in_classifica,created_at").order("created_at", { ascending: false }).limit(500),
     admin.from("orientamento_proposte").select("id,nome,cognome,titolo,area,tipologia,descrizione,durata_minuti,partecipanti,esigenze,nota,stato,in_classifica,created_at").order("created_at", { ascending: false }).limit(500),
-    admin.from("orientamento_attivita").select("id,nome,cognome,tipo,scuola_id,titolo,data,nota,in_classifica,created_at").eq("archiviata", false).order("data", { ascending: false }).limit(1000),
+    admin.from("orientamento_attivita").select("id,nome,cognome,tipo,scuola_id,titolo,data,nota,in_classifica,stato,created_at").eq("archiviata", false).order("data", { ascending: false }).limit(1000),
   ]);
   if (schools.error || supporter.error || proposals.error || activities.error) throw new PublicServiceError();
-  return { schools: schools.data ?? [], supporters: supporter.data ?? [], proposals: proposals.data ?? [], activities: activities.data ?? [] };
+  // Solo le attività confermate dalla Funzione Strumentale contano per punti, mappa ed elenco.
+  const allActivities = activities.data ?? [];
+  return {
+    schools: schools.data ?? [], supporters: supporter.data ?? [], proposals: proposals.data ?? [],
+    activities: allActivities.filter((item) => item.stato === "confermata"),
+    pendingActivities: allActivities.filter((item) => item.stato === "da_confermare"),
+  };
 }
 
 function displayName(nome: string, cognome: string) {
@@ -417,6 +423,7 @@ async function listContributions(request: Request) {
       disponibilita: data.supporters,
       proposte: data.proposals,
       attivita: data.activities,
+      da_confermare: data.pendingActivities,
       classifica: ranking.map((entry, index) => ({
         posizione: index + 1,
         nome: entry.nome,
@@ -434,31 +441,64 @@ async function listContributions(request: Request) {
   }
 }
 
+async function activityFields(payload: Record<string, unknown>) {
+  const nome = publicName(payload.nome);
+  const cognome = publicName(payload.cognome);
+  const tipo = typeof payload.tipo === "string" && ACTIVITY_TYPES.has(payload.tipo) ? payload.tipo : "";
+  if (!tipo) throw new Error("Scegli il tipo di attività.");
+  const data = typeof payload.data === "string" && /^\d{4}-\d{2}-\d{2}$/.test(payload.data) ? payload.data : "";
+  if (!data || Number.isNaN(Date.parse(data))) throw new Error("Indica la data dell’attività.");
+  const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  if (data > tomorrow) throw new Error("La data non può essere nel futuro: registra l’attività dopo averla svolta.");
+  const titolo = publicText(payload.titolo ?? "", 0, 160);
+  const nota = publicText(payload.nota ?? "", 0, 600);
+  let scuolaId: string | null = null;
+  if (tipo === "visita") {
+    scuolaId = typeof payload.scuola_id === "string" && /^[a-z0-9-]{3,80}$/.test(payload.scuola_id) ? payload.scuola_id : null;
+    if (!scuolaId) throw new Error("Scegli la scuola visitata.");
+    const { data: school, error } = await admin.from("orientamento_scuole").select("id").eq("id", scuolaId).maybeSingle();
+    if (error) throw new PublicServiceError();
+    if (!school) throw new Error("Scuola non valida.");
+  }
+  return { nome, cognome, tipo, scuola_id: scuolaId, titolo, data, nota, in_classifica: payload.in_classifica === true };
+}
+
 async function registerActivity(request: Request, payload: Record<string, unknown>) {
   try {
-    const nome = publicName(payload.nome);
-    const cognome = publicName(payload.cognome);
-    const tipo = typeof payload.tipo === "string" && ACTIVITY_TYPES.has(payload.tipo) ? payload.tipo : "";
-    if (!tipo) throw new Error("Scegli il tipo di attività.");
-    const data = typeof payload.data === "string" && /^\d{4}-\d{2}-\d{2}$/.test(payload.data) ? payload.data : "";
-    if (!data || Number.isNaN(Date.parse(data))) throw new Error("Indica la data dell’attività.");
-    const titolo = publicText(payload.titolo ?? "", 0, 160);
-    const nota = publicText(payload.nota ?? "", 0, 600);
-    let scuolaId: string | null = null;
-    if (tipo === "visita") {
-      scuolaId = typeof payload.scuola_id === "string" && /^[a-z0-9-]{3,80}$/.test(payload.scuola_id) ? payload.scuola_id : null;
-      if (!scuolaId) throw new Error("Scegli la scuola visitata.");
-      const { data: school, error } = await admin.from("orientamento_scuole").select("id").eq("id", scuolaId).maybeSingle();
-      if (error || !school) throw new Error("Scuola non valida.");
-    }
+    const fields = await activityFields(payload);
     const { data: row, error } = await admin.from("orientamento_attivita")
-      .insert({ nome, cognome, tipo, scuola_id: scuolaId, titolo, data, nota, in_classifica: payload.in_classifica === true })
+      .insert({ ...fields, stato: "confermata" })
       .select("id").single();
     if (error || !row) throw new Error("Registrazione non riuscita.");
     return json(request, { ok: true, id: row.id }, 201);
   } catch (error) {
     return json(request, { error: error instanceof Error ? error.message : "Registrazione non riuscita." }, 400);
   }
+}
+
+// Segnalazione pubblica del docente: resta "da_confermare" finché la Funzione Strumentale non la conferma.
+async function reportActivity(request: Request, payload: Record<string, unknown>) {
+  try {
+    if (payload.website) return json(request, { ok: true, codice: "RICEVUTA" });
+    const fields = await activityFields(payload);
+    if (!await publicQuota(request)) return json(request, { error: "Troppe richieste da questa connessione. Riprova domani." }, 429);
+    const { data: row, error } = await admin.from("orientamento_attivita")
+      .insert({ ...fields, stato: "da_confermare" })
+      .select("id").single();
+    if (error || !row) throw new PublicServiceError();
+    return json(request, { ok: true, codice: confirmationCode(row.id) }, 201);
+  } catch (error) {
+    return json(request, { error: error instanceof Error ? error.message : "Invio non riuscito." }, error instanceof PublicServiceError ? 503 : 400);
+  }
+}
+
+async function confirmActivity(request: Request, payload: Record<string, unknown>) {
+  const id = payload.id;
+  if (typeof id !== "string" || !/^[0-9a-f-]{36}$/i.test(id)) return json(request, { error: "Voce non valida." }, 400);
+  const { data, error } = await admin.from("orientamento_attivita").update({ stato: "confermata" })
+    .eq("id", id).eq("archiviata", false).select("id").maybeSingle();
+  if (error || !data) return json(request, { error: "Conferma non riuscita." }, 500);
+  return json(request, { ok: true });
 }
 
 async function archiveActivity(request: Request, payload: Record<string, unknown>) {
@@ -736,6 +776,7 @@ Deno.serve(async (request: Request) => {
   if (action === "submit_supporter") return await submitSupporter(request, payload);
   if (action === "submit_proposal") return await submitProposal(request, payload);
   if (action === "leaderboard") return await leaderboard(request);
+  if (action === "report_activity") return await reportActivity(request, payload);
 
   const session = await verifySession(request);
   if (!session) return json(request, { error: "Sessione scaduta. Accedi di nuovo." }, 401);
@@ -743,13 +784,14 @@ Deno.serve(async (request: Request) => {
   if (action === "list") return await listDocuments(request, session.accessLevel);
   if (action === "view_presentation") return await viewPresentation(request, payload, session.accessLevel);
   // La gestione di candidature, proposte e attività è riservata alla password personale della Funzione Strumentale.
-  if (["list_contributions", "update_contribution", "register_activity", "archive_activity"].includes(action) && session.accessLevel !== "funzione_strumentale") {
+  if (["list_contributions", "update_contribution", "register_activity", "archive_activity", "confirm_activity"].includes(action) && session.accessLevel !== "funzione_strumentale") {
     return json(request, { error: "Accesso riservato alla Funzione Strumentale." }, 403);
   }
   if (action === "list_contributions") return await listContributions(request);
   if (action === "update_contribution") return await updateContribution(request, payload);
   if (action === "register_activity") return await registerActivity(request, payload);
   if (action === "archive_activity") return await archiveActivity(request, payload);
+  if (action === "confirm_activity") return await confirmActivity(request, payload);
   if (["upload", "replace", "upload_presentation", "replace_presentation", "update", "archive"].includes(action) && session.accessLevel === "supporter") {
     return json(request, { error: "Questa password consente soltanto la consultazione." }, 403);
   }

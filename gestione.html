@@ -8,7 +8,7 @@
   <title>Gestione orientamento | IIS Meucci - Mattei</title>
   <link rel="stylesheet" href="portal.css?v=20260922-2">
   <link rel="stylesheet" href="orientamento-modulo.css?v=20260925-1">
-  <link rel="stylesheet" href="gestione.css?v=20260925-1">
+  <link rel="stylesheet" href="gestione.css?v=20260925-2">
 </head>
 <body>
   <header class="site-header">
@@ -53,14 +53,20 @@
         <div class="contribution-summary" id="summary"></div>
 
         <nav class="tabs" role="tablist" aria-label="Sezioni">
-          <button role="tab" data-tab="candidature" aria-selected="true">Candidature <span class="count" id="countCandidature"></span></button>
+          <button role="tab" data-tab="confermare" aria-selected="true">Visite da confermare <span class="count" id="countConfermare"></span></button>
+          <button role="tab" data-tab="candidature" aria-selected="false">Candidature <span class="count" id="countCandidature"></span></button>
           <button role="tab" data-tab="proposte" aria-selected="false">Proposte Mattinée <span class="count" id="countProposte"></span></button>
           <button role="tab" data-tab="scuole" aria-selected="false">Scuole</button>
-          <button role="tab" data-tab="attivita" aria-selected="false">Registra visite</button>
+          <button role="tab" data-tab="attivita" aria-selected="false">Visite svolte</button>
           <button role="tab" data-tab="classifica" aria-selected="false">Classifica</button>
         </nav>
 
-        <section class="tab-panel" data-panel="candidature">
+        <section class="tab-panel" data-panel="confermare">
+          <p class="panel-help">Visite e Mattinée registrate dai docenti. <b>Conferma</b> se l’attività si è svolta: entra nell’elenco per la Dirigente e assegna i punti. <b>Scarta</b> se è un errore o un doppione.</p>
+          <div class="review-list" id="pendingList"></div>
+        </section>
+
+        <section class="tab-panel" data-panel="candidature" hidden>
           <p class="panel-help">Docenti che si sono candidati per andare nelle scuole medie. <b>Accetta</b> chi confermi, <b>Rimuovi</b> chi non partecipa: sparisce dalla classifica e dal conteggio.</p>
           <div class="filters" data-filter-for="candidature">
             <button data-filter="ricevuta" aria-pressed="true">Da valutare</button>
@@ -88,7 +94,11 @@
         </section>
 
         <section class="tab-panel" data-panel="attivita" hidden>
-          <p class="panel-help">Dopo ogni visita o Mattinée realizzata, registrala qui: i punti e la mappa pubblica si aggiornano da soli. Visita +20 (+10 al primo docente in quella scuola), Mattinée realizzata +30.</p>
+          <div class="export-bar">
+            <p class="panel-help">Qui trovi tutte le attività confermate. Il pulsante scarica l’elenco per la Dirigente (docente, attività, scuola, data), da aprire con Excel.</p>
+            <button type="button" class="act ok" id="exportButton">⬇ Scarica elenco per la Dirigente</button>
+          </div>
+          <p class="panel-help">Se un docente non ha registrato un’attività, puoi inserirla tu: risulta subito confermata. Visita +20 (+10 al primo docente in quella scuola), Mattinée realizzata +30.</p>
           <form id="activityForm" class="activity-form">
             <label>Nome <input name="nome" list="teacherNames" maxlength="80" required></label>
             <label>Cognome <input name="cognome" list="teacherSurnames" maxlength="80" required></label>
@@ -107,7 +117,7 @@
           </form>
           <datalist id="teacherNames"></datalist><datalist id="teacherSurnames"></datalist>
           <p id="activityMessage" class="global-message" role="status" aria-live="polite"></p>
-          <h3 class="sub-title">Attività registrate</h3>
+          <h3 class="sub-title">Attività confermate</h3>
           <div class="review-list" id="activityList"></div>
         </section>
 
@@ -123,6 +133,6 @@
     <p>IIS Meucci - Mattei | Decimomannu</p>
     <p>Area riservata alla Funzione Strumentale per l’orientamento.</p>
   </footer>
-  <script src="gestione.js?v=20260925-1"></script>
+  <script src="gestione.js?v=20260925-2"></script>
 </body>
 </html>

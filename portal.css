@@ -239,3 +239,30 @@ main { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
 @media (prefers-reduced-motion: reduce) {
   .audience-buttons button { transition: none; }
 }
+
+.groups-section { padding: 56px clamp(4px, 2.5vw, 26px) 78px; }
+.group-jump { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 26px; }
+.group-jump a { min-height: 64px; padding: 14px 18px; display: flex; align-items: center; border: 1px solid var(--line); border-radius: 18px; color: var(--navy); background: white; box-shadow: 0 12px 28px rgb(18 60 87 / 7%); font-size: clamp(.9rem, 1.5vw, 1.05rem); font-weight: 850; text-decoration: none; }
+.group-jump a:hover { border-color: var(--teal); transform: translateY(-2px); }
+.group-jump span { margin-right: 9px; color: var(--pink); }
+.group-jump a:nth-child(2) span { color: var(--green); }
+.group-jump a:nth-child(3) span { color: var(--teal); }
+.group-jump a:nth-child(4) span { color: #d98c00; }
+.group-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.group-card { padding: 26px; border-radius: 28px; color: white; box-shadow: 0 22px 50px rgb(18 60 87 / 13%); scroll-margin-top: 20px; }
+.group-studenti { background: linear-gradient(145deg, var(--green), #00a66a); }
+.group-famiglie { background: linear-gradient(145deg, var(--navy), #247c88); }
+.group-docenti { background: linear-gradient(145deg, var(--pink), #b70858); }
+.group-medie { background: linear-gradient(145deg, #17656b, #4f8700); }
+.group-card header { display: grid; grid-template-columns: 50px 1fr; gap: 16px; align-items: center; }
+.group-icon { width: 50px; height: 50px; display: grid; place-items: center; border: 1px solid rgb(255 255 255 / 30%); border-radius: 16px; background: rgb(255 255 255 / 12%); font-size: 1.2rem; }
+.group-card h3 { margin: 0; font-size: clamp(1.6rem, 2.8vw, 2.3rem); line-height: 1; letter-spacing: -.04em; }
+.group-card header p { margin: 6px 0 0; color: rgb(255 255 255 / 82%); font-size: .9rem; }
+.group-links { display: grid; gap: 9px; margin: 22px 0 0; padding: 0; list-style: none; }
+.group-links a { display: grid; gap: 3px; padding: 13px 16px; border-radius: 14px; color: var(--navy); background: white; text-decoration: none; }
+.group-links a:hover { box-shadow: 0 8px 24px rgb(18 60 87 / 25%); }
+.group-links strong { font-size: .94rem; }
+.group-links span { color: var(--muted); font-size: .8rem; line-height: 1.4; overflow-wrap: anywhere; }
+.group-links strong span { color: inherit; font-size: inherit; }
+@media (max-width: 850px) { .group-jump { grid-template-columns: repeat(2, 1fr); } .group-grid { grid-template-columns: 1fr; } }
+@media (max-width: 420px) { .group-card { padding: 20px 16px; } .group-jump a { min-height: 56px; padding: 12px; } }

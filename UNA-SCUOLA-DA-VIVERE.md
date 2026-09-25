@@ -50,7 +50,11 @@ dalla funzione Edge (azione pubblica `leaderboard`):
 | Mattinée realizzata | 30 |
 | Primo docente a visitare una scuola (Apripista) | 10 |
 
-Le visite e le Mattinée realizzate sono registrate dalla Funzione Strumentale in
+Le visite e le Mattinée realizzate sono registrate dai docenti nel modulo pubblico
+“Ho svolto una visita” (azione `report_activity`, stato `da_confermare`): contano per
+punti, mappa ed elenco solo dopo la conferma della Funzione Strumentale nella scheda
+“Visite da confermare” di `gestione.html`, da cui si scarica anche l’elenco CSV per la
+Dirigente. La Funzione Strumentale può anche registrarle direttamente in
 `gestione.html` (password `funzione_strumentale`, sezione “Registra visite”) e finiscono nella tabella `orientamento_attivita`. Una registrazione
 errata si annulla dalla stessa sezione. I contributi dello stesso docente si
 sommano confrontando nome e cognome senza accenti e maiuscole.

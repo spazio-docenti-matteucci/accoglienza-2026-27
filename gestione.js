@@ -101,17 +101,20 @@ function renderSummary() {
   summary.replaceChildren();
   const pendingSupporters = data.disponibilita.filter((item) => item.stato === 'ricevuta').length;
   const pendingProposals = data.proposte.filter((item) => ['ricevuta', 'in_valutazione'].includes(item.stato)).length;
+  const pendingActivities = data.da_confermare.length;
   const visited = new Set(data.attivita.filter((item) => item.tipo === 'visita').map((item) => item.scuola_id));
   for (const [value, label, hot] of [
+    [pendingActivities, 'visite da confermare', pendingActivities > 0],
     [pendingSupporters, 'candidature da valutare', pendingSupporters > 0],
     [pendingProposals, 'proposte da valutare', pendingProposals > 0],
     [`${visited.size}/${data.scuole.length}`, 'scuole visitate', false],
-    [data.attivita.length, 'attività registrate', false],
+    [data.attivita.length, 'attività confermate', false],
   ]) {
     const box = el('div', hot ? 'hot' : '');
     box.append(el('strong', '', String(value)), el('span', '', label));
     summary.append(box);
   }
+  document.getElementById('countConfermare').textContent = pendingActivities ? String(pendingActivities) : '';
   document.getElementById('countCandidature').textContent = pendingSupporters ? String(pendingSupporters) : '';
   document.getElementById('countProposte').textContent = pendingProposals ? String(pendingProposals) : '';
 }
@@ -204,20 +207,15 @@ function renderActivities(schoolNames) {
     activitySchool.append(option);
   }
   if (current) activitySchool.value = current;
-  const people = [...data.disponibilita, ...data.proposte, ...data.attivita];
+  const people = [...data.disponibilita, ...data.proposte, ...data.attivita, ...data.da_confermare];
   fillDatalist('teacherNames', people.map((item) => item.nome));
   fillDatalist('teacherSurnames', people.map((item) => item.cognome));
 
   const list = document.getElementById('activityList');
   list.replaceChildren();
-  if (!data.attivita.length) list.append(el('p', 'empty', 'Nessuna attività registrata.'));
+  if (!data.attivita.length) list.append(el('p', 'empty', 'Nessuna attività confermata.'));
   for (const item of data.attivita) {
-    const card = el('article', 'review-card');
-    card.append(el('h4', '', `${item.tipo === 'visita' ? '🧭 Visita' : '🔬 Mattinée'} · ${item.nome} ${item.cognome}`),
-      el('small', '', formatDate(`${item.data}T12:00:00`, false)));
-    if (item.tipo === 'visita') card.append(line('Scuola', schoolNames.get(item.scuola_id) || item.scuola_id));
-    if (item.titolo) card.append(line('Titolo', item.titolo));
-    if (item.nota) card.append(line('Nota', item.nota));
+    const card = activityCard(item, schoolNames);
     const actions = el('div', 'review-actions');
     actions.append(actionButton('Annulla registrazione', 'no', async (button) => {
       if (!window.confirm('Annullare questa registrazione? I punti verranno tolti dalla classifica.')) return;
@@ -236,6 +234,77 @@ function renderActivities(schoolNames) {
   }
 }
 
+function activityCard(item, schoolNames, className = 'review-card') {
+  const card = el('article', className);
+  card.append(el('h4', '', `${item.tipo === 'visita' ? '🧭 Visita' : '🔬 Mattinée'} · ${item.nome} ${item.cognome}`),
+    el('small', '', `Svolta il ${formatDate(`${item.data}T12:00:00`, false)} · registrata il ${formatDate(item.created_at)}`));
+  if (item.tipo === 'visita') card.append(line('Scuola', schoolNames.get(item.scuola_id) || item.scuola_id));
+  if (item.titolo) card.append(line('Titolo', item.titolo));
+  if (item.nota) card.append(line('Nota', item.nota));
+  return card;
+}
+
+function renderPending(schoolNames) {
+  const list = document.getElementById('pendingList');
+  list.replaceChildren();
+  if (!data.da_confermare.length) list.append(el('p', 'empty', 'Nessuna visita da confermare.'));
+  for (const item of data.da_confermare) {
+    const card = activityCard(item, schoolNames, 'review-card pending');
+    const actions = el('div', 'review-actions');
+    actions.append(actionButton('✓ Conferma', 'ok', async (button) => {
+      button.disabled = true;
+      globalMessage.textContent = 'Salvataggio…';
+      try {
+        await api('confirm_activity', { id: item.id });
+        globalMessage.textContent = `Confermata: ${item.nome} ${item.cognome}.`;
+        await load();
+      } catch (error) {
+        button.disabled = false;
+        handleError(error);
+      }
+    }));
+    actions.append(actionButton('✕ Scarta', 'no', async (button) => {
+      if (!window.confirm('Scartare questa registrazione? Non comparirà nell’elenco né in classifica.')) return;
+      button.disabled = true;
+      try {
+        await api('archive_activity', { id: item.id });
+        globalMessage.textContent = 'Registrazione scartata.';
+        await load();
+      } catch (error) {
+        button.disabled = false;
+        handleError(error);
+      }
+    }));
+    card.append(actions);
+    list.append(card);
+  }
+}
+
+// Elenco per la Dirigente: CSV con separatore ";" e BOM, così Excel lo apre con accenti e colonne corrette.
+function exportActivities() {
+  if (!data) return;
+  const schoolNames = new Map(data.scuole.map((school) => [school.id, `${school.comune} · ${school.etichetta}`]));
+  const rows = [...data.attivita]
+    .sort((a, b) => a.data.localeCompare(b.data) || a.cognome.localeCompare(b.cognome, 'it'))
+    .map((item) => [
+      item.data.split('-').reverse().join('/'),
+      item.cognome,
+      item.nome,
+      item.tipo === 'visita' ? 'Visita' : 'Mattinée diffusa',
+      item.tipo === 'visita' ? (schoolNames.get(item.scuola_id) || item.scuola_id) : (item.titolo || ''),
+      item.nota || '',
+    ]);
+  const cell = (value) => `"${String(value).replaceAll('"', '""')}"`;
+  const csv = [['Data', 'Cognome', 'Nome', 'Attività', 'Scuola o titolo', 'Note'], ...rows]
+    .map((row) => row.map(cell).join(';')).join('\r\n');
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(new Blob(['\ufeff', csv], { type: 'text/csv;charset=utf-8' }));
+  link.download = `visite-orientamento-${new Date().toISOString().slice(0, 10)}.csv`;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+  activityMessage.textContent = rows.length ? `Scaricato l’elenco: ${rows.length} ${rows.length === 1 ? 'attività confermata' : 'attività confermate'}.` : 'Nessuna attività confermata da scaricare.';
+}
+
 function renderRanking() {
   const list = document.getElementById('adminRanking');
   list.replaceChildren();
@@ -251,6 +320,7 @@ function renderRanking() {
 function render() {
   const schoolNames = new Map(data.scuole.map((school) => [school.id, `${school.comune} · ${school.etichetta}`]));
   renderSummary();
+  renderPending(schoolNames);
   renderSupporters(schoolNames);
   renderProposals();
   renderSchools();
@@ -262,7 +332,7 @@ async function load() {
   refreshButton.disabled = true;
   try {
     const result = await api('list_contributions');
-    data = { ...result, attivita: result.attivita || [], classifica: result.classifica || [] };
+    data = { ...result, attivita: result.attivita || [], da_confermare: result.da_confermare || [], classifica: result.classifica || [] };
     render();
     if (globalMessage.textContent === 'Caricamento…') globalMessage.textContent = '';
   } catch (error) {
@@ -358,6 +428,7 @@ passwordForm.addEventListener('submit', async (event) => {
 });
 
 refreshButton.addEventListener('click', load);
+document.getElementById('exportButton').addEventListener('click', exportActivities);
 document.getElementById('logoutButton').addEventListener('click', async () => {
   try { await api('logout'); } catch { /* la sessione locale viene chiusa comunque */ }
   resetSession();

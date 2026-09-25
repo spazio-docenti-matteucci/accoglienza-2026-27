@@ -4,6 +4,9 @@ const previewCatalog = document.getElementById('school-preview-data');
 
 const supporterForm = document.getElementById('supporterForm');
 const proposalForm = document.getElementById('proposalForm');
+const reportForm = document.getElementById('reportForm');
+const reportType = document.getElementById('reportType');
+const reportSchool = document.getElementById('reportSchool');
 const schoolChoices = document.getElementById('schoolChoices');
 const schoolError = document.getElementById('schoolError');
 const schoolCounter = document.getElementById('schoolCounter');
@@ -116,6 +119,34 @@ function renderSchools(schools) {
   });
 }
 
+function fillReportSchools(schools) {
+  for (const school of schools) {
+    const option = document.createElement('option');
+    option.value = school.id;
+    option.textContent = `${school.comune} · ${school.etichetta}`;
+    reportSchool.append(option);
+  }
+}
+
+function localToday() {
+  const now = new Date();
+  return new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+}
+
+function syncReportType() {
+  const isVisit = reportType.value === 'visita';
+  document.getElementById('reportSchoolField').hidden = !isVisit;
+  document.getElementById('reportTitleField').hidden = isVisit;
+  reportSchool.required = isVisit;
+}
+
+function resetReportForm() {
+  const today = localToday();
+  reportForm.elements.data.max = today;
+  reportForm.elements.data.value = today;
+  syncReportType();
+}
+
 async function loadSchools() {
   try {
     let schools;
@@ -128,6 +159,7 @@ async function loadSchools() {
     }
     if (!Array.isArray(schools) || !schools.length) throw new Error();
     renderSchools(schools);
+    fillReportSchools(schools);
     return schools;
   } catch {
     schoolChoices.textContent = 'L’elenco delle scuole non è disponibile. Riprova più tardi.';
@@ -279,6 +311,8 @@ async function submitForm(event, action, messageId) {
       schoolChoices.scrollIntoView({ block: 'center', behavior: 'smooth' });
       return;
     }
+  } else if (action === 'report_activity') {
+    if (data.tipo !== 'visita') delete data.scuola_id;
   } else {
     data.durata_minuti = Number(data.durata_minuti);
     data.partecipanti = data.partecipanti ? Number(data.partecipanti) : null;
@@ -291,9 +325,12 @@ async function submitForm(event, action, messageId) {
     form.reset();
     schoolError.hidden = true;
     updateSchoolCounter();
-    const text = action === 'submit_supporter'
-      ? `Candidatura ricevuta, grazie! I +5 punti sono tuoi. Codice ${result.codice}. La Commissione ti ricontatterà per date e abbinamenti.`
-      : `Idea ricevuta, grazie! +10 punti per te. Codice ${result.codice}. La Commissione la valuterà e ti farà sapere.`;
+    if (action === 'report_activity') resetReportForm();
+    const text = {
+      submit_supporter: `Candidatura ricevuta, grazie! I +5 punti sono tuoi. Codice ${result.codice}. La Funzione Strumentale ti ricontatterà per date e abbinamenti.`,
+      submit_proposal: `Idea ricevuta, grazie! +10 punti per te. Codice ${result.codice}. La Commissione la valuterà e ti farà sapere.`,
+      report_activity: `Registrazione ricevuta, grazie! Codice ${result.codice}. Dopo la conferma della Funzione Strumentale l’attività entra nell’elenco per la Dirigente e i punti compaiono in classifica.`,
+    }[action];
     setMessage(messageId, text, 'success');
     celebrate();
     loadLeaderboard(currentSchools);
@@ -317,6 +354,9 @@ function rotateQuotes() {
 let currentSchools = [];
 supporterForm.addEventListener('submit', (event) => submitForm(event, 'submit_supporter', 'supporterMessage'));
 proposalForm.addEventListener('submit', (event) => submitForm(event, 'submit_proposal', 'proposalMessage'));
+reportForm.addEventListener('submit', (event) => submitForm(event, 'report_activity', 'reportMessage'));
+reportType.addEventListener('change', syncReportType);
+resetReportForm();
 loadSchools().then((schools) => {
   currentSchools = schools;
   return loadLeaderboard(schools);

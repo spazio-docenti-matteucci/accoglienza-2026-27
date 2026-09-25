@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Materiali per accoglienza e orientamento dell’IIS Meucci - Mattei a Decimomannu.">
   <title>Accoglienza e orientamento | IIS Meucci - Mattei | Decimomannu</title>
-  <link rel="stylesheet" href="portal.css?v=20260923-brand">
+  <link rel="stylesheet" href="portal.css?v=20260925-home">
 </head>
 <body>
   <header class="site-header">
@@ -26,76 +26,54 @@
       <div class="hero-bubbles" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
     </section>
 
-    <section class="audience-section" aria-labelledby="audience-title">
-      <div class="section-heading">
-        <div><p class="step">01 · PER CHI</p><h2 id="audience-title">Chi sei?</h2></div>
-        <button class="reset-filter" id="resetFilter" type="button" hidden>Mostra tutto</button>
+    <section class="groups-section" aria-labelledby="groups-title">
+      <div class="section-heading"><div><p class="step">Per chi</p><h2 id="groups-title">Chi sei?</h2></div></div>
+      <nav class="group-jump" aria-label="Vai alla tua sezione">
+        <a href="#studenti"><span aria-hidden="true">✦</span> Studenti</a>
+        <a href="#famiglie"><span aria-hidden="true">⌂</span> Famiglie</a>
+        <a href="#docenti"><span aria-hidden="true">●</span> Docenti</a>
+        <a href="#medie"><span aria-hidden="true">★</span> Studenti delle medie</a>
+      </nav>
+
+      <div class="group-grid">
+        <section class="group-card group-studenti" id="studenti" aria-labelledby="studenti-title">
+          <header><span class="group-icon" aria-hidden="true">✦</span><div><h3 id="studenti-title">Studenti</h3><p>Per chi frequenta il Meucci - Mattei.</p></div></header>
+          <ul class="group-links">
+            <li><a href="accoglienza.html"><strong>Accoglienza 2026/27</strong><span>Programma della prima giornata, orari e classi</span></a></li>
+            <li><a href="documenti/accoglienza/Presentazione_accoglienza_studenti_Meucci_Mattei_2026-27.pdf" target="_blank" rel="noopener"><strong>Presentazione per studenti <span aria-hidden="true">↗</span></strong><span>La scuola in poche pagine (PDF)</span></a></li>
+            <li><a href="indirizzi.html"><strong>Indirizzi di studio</strong><span>AFM, SIA, Turismo, SSAS e CAT Archeodesign</span></a></li>
+            <li><a href="curricoli.html"><strong>Curricoli dei corsi</strong><span>Competenze, conoscenze e attività per indirizzo</span></a></li>
+          </ul>
+        </section>
+
+        <section class="group-card group-famiglie" id="famiglie" aria-labelledby="famiglie-title">
+          <header><span class="group-icon" aria-hidden="true">⌂</span><div><h3 id="famiglie-title">Famiglie</h3><p>Informazioni utili per accompagnare i figli.</p></div></header>
+          <ul class="group-links">
+            <li><a href="accoglienza.html"><strong>Accoglienza 2026/27</strong><span>Programma della prima giornata e organizzazione</span></a></li>
+            <li><a href="indirizzi.html"><strong>Indirizzi di studio</strong><span>I percorsi attivi a Decimomannu</span></a></li>
+            <li><a href="curricoli.html"><strong>Curricoli dei corsi</strong><span>Che cosa si studia in ciascun indirizzo</span></a></li>
+          </ul>
+        </section>
+
+        <section class="group-card group-docenti" id="docenti" aria-labelledby="docenti-title">
+          <header><span class="group-icon" aria-hidden="true">●</span><div><h3 id="docenti-title">Docenti</h3><p>Orientamento, accoglienza e materiali di lavoro.</p></div></header>
+          <ul class="group-links">
+            <li><a href="una-scuola-da-vivere.html"><strong>Una scuola da vivere</strong><span>Candidature per le scuole medie, Mattinée e registrazione delle visite svolte</span></a></li>
+            <li><a href="orientamento.html"><strong>Commissione Orientamento <span aria-hidden="true">🔒</span></strong><span>Area riservata con password</span></a></li>
+            <li><a href="accoglienza.html"><strong>Accoglienza 2026/27</strong><span>Programma della prima giornata</span></a></li>
+            <li><a href="curricoli.html"><strong>Curricoli dei corsi</strong><span>Competenze, conoscenze e attività per indirizzo</span></a></li>
+          </ul>
+        </section>
+
+        <section class="group-card group-medie" id="medie" aria-labelledby="medie-title">
+          <header><span class="group-icon" aria-hidden="true">★</span><div><h3 id="medie-title">Studenti delle medie</h3><p>Per chi sta scegliendo la scuola superiore.</p></div></header>
+          <ul class="group-links">
+            <li><a href="indirizzi.html"><strong>Scopri i nostri indirizzi</strong><span>Cinque percorsi diurni e tre serali</span></a></li>
+            <li><a href="curricoli.html"><strong>Che cosa si studia</strong><span>Le materie e le attività di ogni corso</span></a></li>
+            <li><a href="mailto:orientamattei@gmail.com?subject=Orientamento"><strong>Scrivi alla Commissione Orientamento</strong><span>orientamattei@gmail.com</span></a></li>
+          </ul>
+        </section>
       </div>
-      <div class="audience-buttons" role="group" aria-label="Filtra i contenuti per destinatario">
-        <button type="button" data-filter="studenti" aria-pressed="false"><span aria-hidden="true">✦</span> Studenti</button>
-        <button type="button" data-filter="famiglie" aria-pressed="false"><span aria-hidden="true">⌂</span> Famiglie</button>
-        <button type="button" data-filter="docenti" aria-pressed="false"><span aria-hidden="true">●</span> Docenti</button>
-      </div>
-      <p class="filter-status" id="filterStatus" aria-live="polite">Sono visibili tutti i contenuti.</p>
-    </section>
-
-    <section class="areas-section" aria-labelledby="areas-title">
-      <div class="section-heading"><div><p class="step">02 · AREA</p><h2 id="areas-title">Che cosa cerchi?</h2></div></div>
-      <div class="area-grid" id="areaGrid">
-        <article class="area-card welcome-area" data-audiences="studenti famiglie docenti">
-          <div class="area-number">01</div>
-          <div class="area-content">
-            <p class="area-tag">Studenti · Famiglie · Docenti</p>
-            <h3>Accoglienza 2026/27</h3>
-            <p>Programma della prima mattinata, orari, attività e organizzazione delle classi.</p>
-            <div class="area-actions">
-              <a href="accoglienza.html">Programma della giornata <span aria-hidden="true">→</span></a>
-              <a class="secondary-action" href="documenti/accoglienza/Presentazione_accoglienza_studenti_Meucci_Mattei_2026-27.pdf" target="_blank" rel="noopener">Presentazione per studenti <span aria-hidden="true">↗</span></a>
-            </div>
-          </div>
-        </article>
-
-        <article class="area-card orientation-area" data-audiences="docenti">
-          <div class="area-number">02</div>
-          <div class="area-content">
-            <p class="area-tag">Docenti · Area riservata</p>
-            <h3>Commissione Orientamento</h3>
-            <p>Documenti e materiali di lavoro condivisi con i docenti della commissione.</p>
-            <a href="orientamento.html">Accedi con password <span aria-hidden="true">🔒</span></a>
-          </div>
-        </article>
-
-        <article class="area-card study-area" data-audiences="studenti famiglie docenti">
-          <div class="area-number">03</div>
-          <div class="area-content">
-            <p class="area-tag">Studenti · Famiglie · Docenti</p>
-            <h3>Indirizzi di studio</h3>
-            <p>Una panoramica dei percorsi AFM, SIA, Turismo, SSAS e CAT Archeodesign a Decimomannu.</p>
-            <a href="indirizzi.html">Conosci i nostri indirizzi <span aria-hidden="true">→</span></a>
-          </div>
-        </article>
-
-        <article class="area-card curricula-area" data-audiences="studenti famiglie docenti">
-          <div class="area-number">04</div>
-          <div class="area-content">
-            <p class="area-tag">Studenti · Famiglie · Docenti</p>
-            <h3>Curricoli dei nostri corsi</h3>
-            <p>Competenze, conoscenze, attività e percorsi formativi organizzati per indirizzo.</p>
-            <a href="curricoli.html">Consulta i curricoli <span aria-hidden="true">→</span></a>
-          </div>
-        </article>
-
-        <article class="area-card support-area" data-audiences="docenti">
-          <div class="area-number">05</div>
-          <div class="area-content">
-            <p class="area-tag">Docenti · Campagna di orientamento</p>
-            <h3>Una scuola da vivere</h3>
-            <p>Dai la tua disponibilità per una scuola del territorio o proponi un laboratorio o una lezione aperta per le Mattinée diffuse.</p>
-            <a href="una-scuola-da-vivere.html">Partecipa senza password <span aria-hidden="true">→</span></a>
-          </div>
-        </article>
-      </div>
-      <p class="empty-state" id="emptyState" hidden>Nessun contenuto disponibile per questa scelta.</p>
     </section>
   </main>
 
@@ -103,6 +81,5 @@
     <p>IIS Meucci - Mattei | Decimomannu</p>
     <p>Questo spazio non sostituisce il sito istituzionale della scuola.</p>
   </footer>
-  <script src="portal.js?v=20260915-1"></script>
 </body>
 </html>
