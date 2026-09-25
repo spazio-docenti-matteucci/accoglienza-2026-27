@@ -21,6 +21,12 @@ const coverageGrid = document.getElementById('coverageGrid');
 const supporterList = document.getElementById('supporterList');
 const proposalList = document.getElementById('proposalList');
 const refreshContributionsButton = document.getElementById('refreshContributions');
+const activityForm = document.getElementById('activityForm');
+const activityType = document.getElementById('activityType');
+const activitySchool = document.getElementById('activitySchool');
+const activityMessage = document.getElementById('activityMessage');
+const activityList = document.getElementById('activityList');
+const adminRanking = document.getElementById('adminRanking');
 
 let sessionToken = sessionStorage.getItem(SESSION_KEY) || '';
 let accessLevel = '';
@@ -73,6 +79,8 @@ function resetSession() {
   coverageGrid.replaceChildren();
   supporterList.replaceChildren();
   proposalList.replaceChildren();
+  activityList.replaceChildren();
+  adminRanking.replaceChildren();
   workspacePanel.hidden = true;
   loginPanel.hidden = false;
 }
@@ -212,6 +220,7 @@ function renderContributions(data) {
     [data.scuole.length, 'scuole e sedi nell’elenco'],
     [data.disponibilita.length, 'disponibilità ricevute'],
     [data.proposte.length, 'proposte Mattinée diffuse'],
+    [(data.attivita || []).length, 'attività svolte registrate'],
   ]) {
     const metric = document.createElement('div');
     const number = document.createElement('strong');
@@ -277,7 +286,115 @@ function renderContributions(data) {
     ]));
     proposalList.append(card);
   }
+
+  renderActivities(data, schoolNames);
 }
+
+function fillDatalist(id, values) {
+  const list = document.getElementById(id);
+  list.replaceChildren();
+  for (const value of [...new Set(values)].sort((a, b) => a.localeCompare(b, 'it'))) {
+    const option = document.createElement('option');
+    option.value = value;
+    list.append(option);
+  }
+}
+
+function renderActivities(data, schoolNames) {
+  const current = activitySchool.value;
+  activitySchool.replaceChildren();
+  for (const school of data.scuole) {
+    const option = document.createElement('option');
+    option.value = school.id;
+    option.textContent = `${school.comune} · ${school.etichetta}`;
+    activitySchool.append(option);
+  }
+  if (current) activitySchool.value = current;
+
+  const people = [...data.disponibilita, ...data.proposte, ...(data.attivita || [])];
+  fillDatalist('teacherNames', people.map((item) => item.nome));
+  fillDatalist('teacherSurnames', people.map((item) => item.cognome));
+
+  adminRanking.replaceChildren();
+  if (!data.classifica?.length) adminRanking.textContent = 'Ancora nessun punto assegnato.';
+  for (const entry of data.classifica || []) {
+    const row = document.createElement('li');
+    const name = document.createElement('strong');
+    name.textContent = `${entry.nome} ${entry.cognome}`;
+    const detail = document.createElement('span');
+    detail.textContent = `${entry.punti} pt · ${entry.livello} · ${entry.visite} visite · ${entry.mattinee} Mattinée${entry.consenso ? '' : ' · non in classifica pubblica'}`;
+    row.append(name, detail);
+    adminRanking.append(row);
+  }
+
+  activityList.replaceChildren();
+  if (!data.attivita?.length) activityList.textContent = 'Nessuna attività registrata.';
+  for (const item of data.attivita || []) {
+    const card = document.createElement('article');
+    card.className = 'contribution-card';
+    const title = document.createElement('h5');
+    title.textContent = `${item.tipo === 'visita' ? '🧭 Visita' : '🔬 Mattinée'} · ${item.nome} ${item.cognome}`;
+    const meta = document.createElement('small');
+    meta.textContent = new Intl.DateTimeFormat('it-IT', { dateStyle: 'medium' }).format(new Date(`${item.data}T12:00:00`));
+    card.append(title, meta);
+    if (item.tipo === 'visita') card.append(contributionText('Scuola', schoolNames.get(item.scuola_id) || item.scuola_id));
+    if (item.titolo) card.append(contributionText('Titolo', item.titolo));
+    if (item.nota) card.append(contributionText('Nota', item.nota));
+    const remove = document.createElement('button');
+    remove.type = 'button';
+    remove.className = 'activity-remove';
+    remove.textContent = 'Annulla registrazione';
+    remove.addEventListener('click', async () => {
+      if (!window.confirm('Annullare questa registrazione? I punti verranno tolti dalla classifica.')) return;
+      remove.disabled = true;
+      try {
+        await api('archive_activity', { id: item.id });
+        activityMessage.textContent = 'Registrazione annullata.';
+        await loadContributions();
+      } catch (error) {
+        activityMessage.textContent = error.message;
+        remove.disabled = false;
+        if (error.status === 401) resetSession();
+      }
+    });
+    card.append(remove);
+    activityList.append(card);
+  }
+}
+
+function syncActivityType() {
+  const isVisit = activityType.value === 'visita';
+  document.getElementById('activitySchoolField').hidden = !isVisit;
+  document.getElementById('activityTitleField').hidden = isVisit;
+  activitySchool.required = isVisit;
+}
+
+activityType.addEventListener('change', syncActivityType);
+activityForm.elements.data.value = new Date().toISOString().slice(0, 10);
+syncActivityType();
+
+activityForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  if (!activityForm.reportValidity()) return;
+  const data = Object.fromEntries(new FormData(activityForm).entries());
+  data.in_classifica = activityForm.elements.in_classifica.checked;
+  if (data.tipo !== 'visita') delete data.scuola_id;
+  const button = activityForm.querySelector('button[type="submit"]');
+  button.disabled = true;
+  activityMessage.textContent = 'Registrazione in corso…';
+  try {
+    await api('register_activity', data);
+    activityMessage.textContent = `Registrato: punti assegnati a ${data.nome} ${data.cognome}.`;
+    for (const name of ['nome', 'cognome', 'nota', 'titolo']) activityForm.elements[name].value = '';
+    activityForm.elements.in_classifica.checked = false;
+    await loadContributions();
+  } catch (error) {
+    activityMessage.textContent = error.message;
+    if (error.status === 401) resetSession();
+  } finally {
+    button.disabled = false;
+  }
+});
 
 async function loadContributions() {
   if (accessLevel !== 'orientatore') return;

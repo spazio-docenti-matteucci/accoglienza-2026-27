@@ -35,3 +35,32 @@ verranno definiti.
 Gli invii anonimi hanno un limite giornaliero per indirizzo di rete e un campo
 trappola per gli invii automatici. Nome e cognome sono autodichiarati: ogni
 assegnazione richiede verifica umana della Commissione.
+
+## Classifica a punti
+
+La pagina pubblica mostra una sfida di squadra (scuole “accese” sul totale),
+il regolamento a punti e la classifica dei docenti. I punti sono calcolati solo
+dalla funzione Edge (azione pubblica `leaderboard`):
+
+| Azione | Punti |
+| --- | --- |
+| Disponibilità per le scuole (una volta per docente) | 5 |
+| Proposta di Mattinée (non archiviata) | 10, +10 se approvata |
+| Visita svolta in una scuola | 20 |
+| Mattinée realizzata | 30 |
+| Primo docente a visitare una scuola (Apripista) | 10 |
+
+Le visite e le Mattinée realizzate sono registrate dalla Commissione in
+`orientamento.html` (password `orientatore`, riquadro “Registra un’attività
+svolta”) e finiscono nella tabella `orientamento_attivita`. Una registrazione
+errata si annulla dallo stesso riquadro. I contributi dello stesso docente si
+sommano confrontando nome e cognome senza accenti e maiuscole.
+
+In classifica pubblica compaiono solo iniziale e cognome dei docenti che hanno
+spuntato il consenso (`in_classifica`), in almeno un invio o nella
+registrazione della Commissione. Gli altri contano soltanto nei totali di squadra.
+
+Per attivarla: applicare `supabase/sql/una-scuola-da-vivere-classifica.sql`,
+poi distribuire la funzione `orientamento` aggiornata. Finché la funzione non è
+aggiornata la pagina mostra la classifica vuota e i moduli continuano a
+funzionare.

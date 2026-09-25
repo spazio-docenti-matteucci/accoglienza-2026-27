@@ -8,7 +8,7 @@
 .contribution-heading button { padding: 10px 15px; border: 1px solid var(--line); border-radius: 11px; color: var(--navy); background: #fff; cursor: pointer; font-size: .78rem; font-weight: 800; }
 .contribution-heading button:disabled { opacity: .5; }
 #contributionMessage { min-height: 1.2em; color: var(--muted); font-size: .8rem; }
-.contribution-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 15px 0 22px; }
+.contribution-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 15px 0 22px; }
 .contribution-summary > div { padding: 16px; border: 1px solid #d9e9df; border-radius: 14px; background: #eff7f1; }
 .contribution-summary strong { display: block; color: var(--navy); font-size: 1.8rem; line-height: 1; }
 .contribution-summary span { display: block; margin-top: 7px; color: var(--muted); font-size: .72rem; }
@@ -33,3 +33,24 @@
 .contribution-status select { width: 100%; padding: 9px; border: 1px solid #b9cbd1; border-radius: 9px; color: var(--ink); background: white; font: inherit; }
 @media (max-width: 850px) { .coverage-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 650px) { .contribution-heading { align-items: flex-start; flex-direction: column; } .contribution-summary, .contribution-columns, .coverage-grid { grid-template-columns: 1fr; } }
+.activity-panel { margin: 0 0 28px; padding: 22px; border: 1px solid #d9e9df; border-radius: 16px; background: #f6fbf7; }
+.activity-panel h4 { margin: 0 0 6px; color: var(--navy); font-size: 1.12rem; }
+.activity-panel > p { margin: 0 0 16px; color: var(--muted); font-size: .8rem; line-height: 1.45; }
+.activity-form { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; align-items: end; }
+.activity-form label { display: grid; gap: 6px; color: var(--navy); font-size: .74rem; font-weight: 800; }
+.activity-form label span { color: var(--muted); font-weight: 600; }
+.activity-form input:not([type="checkbox"]), .activity-form select { width: 100%; padding: 9px 11px; border: 1px solid #b9cbd1; border-radius: 9px; color: var(--ink); background: #fff; font: inherit; font-size: .85rem; }
+.activity-form .activity-wide { grid-column: span 2; }
+.activity-form .activity-check { display: flex; align-items: center; gap: 8px; grid-column: 1 / -1; font-weight: 700; }
+.activity-form button { grid-column: 1 / -1; justify-self: start; padding: 11px 18px; border: 0; border-radius: 11px; color: white; background: var(--green); cursor: pointer; font-size: .82rem; font-weight: 850; }
+.activity-form button:disabled { opacity: .55; }
+#activityMessage { min-height: 1.2em; margin: 10px 0; color: var(--navy); font-size: .8rem; font-weight: 700; }
+.activity-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.activity-columns h5 { margin: 0 0 10px; color: var(--navy); font-size: .92rem; }
+.admin-ranking { display: grid; gap: 6px; margin: 0; padding-left: 22px; color: var(--muted); font-size: .8rem; }
+.admin-ranking li strong { display: block; color: var(--navy); }
+.admin-ranking li span { font-size: .72rem; }
+.activity-list { display: grid; gap: 9px; max-height: 420px; overflow: auto; color: var(--muted); font-size: .8rem; }
+.activity-remove { margin-top: 12px; padding: 7px 11px; border: 1px solid #e6b9c2; border-radius: 9px; color: #9b1930; background: #fff; cursor: pointer; font-size: .72rem; font-weight: 800; }
+@media (max-width: 850px) { .activity-form { grid-template-columns: repeat(2, minmax(0, 1fr)); } .contribution-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 650px) { .activity-form, .activity-columns { grid-template-columns: 1fr; } .activity-form .activity-wide { grid-column: auto; } }

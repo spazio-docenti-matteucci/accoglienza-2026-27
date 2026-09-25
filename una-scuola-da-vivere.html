@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow, noarchive">
-  <meta name="description" content="Disponibilità dei docenti per l'orientamento dell’IIS Meucci - Mattei a Decimomannu.">
+  <meta name="description" content="La sfida di orientamento dei docenti dell’IIS Meucci - Mattei a Decimomannu: visite nelle scuole, Mattinée diffuse e classifica a punti.">
   <title>Una scuola da vivere | IIS Meucci - Mattei | Decimomannu</title>
   <link rel="stylesheet" href="portal.css?v=20260922-2">
-  <link rel="stylesheet" href="una-scuola-da-vivere.css?v=20260922-1">
+  <link rel="stylesheet" href="una-scuola-da-vivere.css?v=20260925-1">
 </head>
 <body>
   <header class="site-header">
@@ -23,47 +23,111 @@
 
   <main class="support-main">
     <section class="support-hero">
-      <p class="eyebrow">Campagna di orientamento 2026/27 · Docenti</p>
+      <p class="eyebrow">La sfida dei docenti · Orientamento 2026/27</p>
       <h1>Una scuola<br><span>da vivere</span></h1>
-      <p>A Decimomannu incontriamo le scuole del territorio e apriamo i nostri spazi a laboratori e lezioni. Qui puoi dare la tua disponibilità o proporre un’attività.</p>
+      <p class="hero-lead">Ogni visita in una scuola media è un ragazzo che ci conosce <em>prima</em> di scegliere. Quest’anno lo facciamo insieme, e facciamo anche punti.</p>
+      <div class="hero-stats" id="heroStats" aria-live="polite">
+        <div><strong data-stat="scuole_visitate">–</strong><span>scuole già raggiunte</span></div>
+        <div><strong data-stat="docenti">–</strong><span>docenti in gioco</span></div>
+        <div><strong data-stat="mattinee_proposte">–</strong><span>Mattinée proposte</span></div>
+      </div>
       <div class="hero-actions">
-        <a href="#scuole">Affianca l’orientamento nelle scuole <span aria-hidden="true">→</span></a>
-        <a href="#mattinee">Proponi una Mattinée diffusa <span aria-hidden="true">→</span></a>
+        <a href="#scuole">🧭 Mi candido per le scuole <span aria-hidden="true">→</span></a>
+        <a href="#mattinee">🔬 Propongo una Mattinée <span aria-hidden="true">→</span></a>
+        <a href="#classifica">🏆 Vedi la classifica <span aria-hidden="true">→</span></a>
       </div>
     </section>
 
-    <p class="support-intro">In questa fase raccogliamo disponibilità e proposte. La Commissione Orientamento definirà successivamente assegnazioni, date e orari.</p>
+    <section class="mission" aria-labelledby="mission-title">
+      <div class="mission-copy">
+        <p class="kicker">Obiettivo di squadra</p>
+        <h2 id="mission-title">Accendiamo tutte le <span data-stat="scuole">24</span> scuole</h2>
+        <p>Ogni scuola del territorio si illumina quando un docente del Meucci - Mattei ci mette piede. Un tassello alla volta, fino alla mappa completa.</p>
+        <div class="progress" role="progressbar" aria-label="Scuole raggiunte" aria-valuemin="0" aria-valuemax="24" aria-valuenow="0" id="missionProgress">
+          <span id="missionBar"></span>
+        </div>
+        <p class="progress-caption" id="missionCaption">Caricamento della mappa…</p>
+      </div>
+      <div class="school-lights" id="schoolLights" aria-label="Stato delle scuole"></div>
+      <ul class="lights-legend">
+        <li><i class="lit"></i>Visitata</li>
+        <li><i class="warm"></i>C’è un docente pronto</li>
+        <li><i></i>Ancora da conquistare</li>
+      </ul>
+    </section>
+
+    <section class="rules" aria-labelledby="rules-title">
+      <div class="rules-heading">
+        <p class="kicker">Come si fanno punti</p>
+        <h2 id="rules-title">Il regolamento, in trenta secondi</h2>
+      </div>
+      <div class="points-grid">
+        <article><span class="pts">+5</span><h3>Ti candidi</h3><p>Dai la tua disponibilità per una o più scuole.</p></article>
+        <article><span class="pts">+10</span><h3>Proponi una Mattinée</h3><p>Un laboratorio o una lezione aperta. +10 extra se viene approvata.</p></article>
+        <article class="hot"><span class="pts">+20</span><h3>Visiti una scuola</h3><p>Per ogni visita svolta, registrata dalla Commissione.</p></article>
+        <article class="hot"><span class="pts">+30</span><h3>Realizzi la Mattinée</h3><p>Ragazzi in laboratorio da noi: il colpo grosso.</p></article>
+        <article class="bonus"><span class="pts">+10</span><h3>Bonus Apripista</h3><p>Sei il primo docente a entrare in quella scuola.</p></article>
+      </div>
+      <div class="badges-row" aria-label="Distintivi">
+        <span title="Almeno una visita svolta">🧭 Esploratore</span>
+        <span title="Tre scuole diverse visitate">🌍 Ambasciatore</span>
+        <span title="Primo docente in una scuola">🚀 Apripista</span>
+        <span title="Almeno una Mattinée proposta">💡 Fucina di idee</span>
+        <span title="Almeno una Mattinée realizzata">🔬 Laboratorio aperto</span>
+      </div>
+      <p class="levels">Livelli: <b>Matricola</b> → <b>Guida</b> (25 pt) → <b>Mentore</b> (60 pt) → <b>Leggenda dell’orientamento</b> (120 pt)</p>
+    </section>
+
+    <section class="leaderboard" id="classifica" aria-labelledby="classifica-title">
+      <div class="leaderboard-heading">
+        <div>
+          <p class="kicker">Hall of fame</p>
+          <h2 id="classifica-title">La classifica dei docenti</h2>
+          <p>Compare solo chi ha scelto di esserci. Gli altri giocano lo stesso: i loro punti contano per la squadra.</p>
+        </div>
+        <div class="team-score"><strong data-stat="punti">–</strong><span>punti di squadra</span></div>
+      </div>
+      <div class="podium" id="podium"></div>
+      <ol class="ranking" id="ranking"></ol>
+      <p class="ranking-empty" id="rankingEmpty" hidden>Il primo posto è ancora libero. Serve solo una candidatura per prenderlo. 👀</p>
+    </section>
+
+    <aside class="quote-band" aria-live="polite"><p id="quote">“Un ragazzo sceglie la scuola in cui ha già visto qualcuno credere in lui.”</p></aside>
 
     <section class="support-section" id="scuole" aria-labelledby="scuole-title">
-      <div class="support-heading"><span class="section-number">01</span><div><p class="eyebrow">Presenza sul territorio</p><h2 id="scuole-title">Affianca l’orientamento in una scuola</h2><p>Scegli fino a cinque scuole nelle quali sei disponibile ad accompagnare le attività di orientamento. La scelta esprime una disponibilità, non un’assegnazione già confermata.</p></div></div>
+      <div class="support-heading"><span class="section-number">01</span><div><p class="eyebrow">Presenza sul territorio · +5 punti</p><h2 id="scuole-title">Mi candido per le scuole</h2><p>Scegli fino a cinque scuole in cui puoi accompagnare l’orientamento. È una disponibilità: la Commissione ti ricontatta per date e abbinamenti. Ogni visita svolta vale poi +20.</p></div></div>
       <form id="supporterForm" class="support-form" novalidate>
         <div class="form-grid">
           <label>Nome <input name="nome" autocomplete="given-name" maxlength="80" required></label>
           <label>Cognome <input name="cognome" autocomplete="family-name" maxlength="80" required></label>
         </div>
         <fieldset class="school-fieldset">
-          <legend>Scuole in cui puoi dare una mano <span class="optional">massimo cinque</span></legend>
-          <p class="school-help">Le denominazioni provengono dall’elenco operativo della campagna e saranno confermate dalla Commissione.</p>
+          <legend>Dove vuoi andare? <span class="optional" id="schoolCounter">0 di 5 scelte</span></legend>
+          <p class="school-help">Le scuole accese sono già state visitate: quelle spente aspettano un apripista.</p>
           <div id="schoolChoices" class="school-choices"></div>
           <p id="schoolError" class="field-error" role="alert" hidden>Seleziona almeno una scuola, fino a un massimo di cinque.</p>
         </fieldset>
         <label>Nota sulla tua disponibilità <span class="optional">facoltativa</span>
           <textarea name="nota" rows="3" maxlength="600" placeholder="Per esempio: conosco già questa scuola o posso accompagnare un collega."></textarea>
         </label>
+        <label class="consent"><input type="checkbox" name="in_classifica" value="1"> <span>Sì, voglio comparire nella classifica pubblica con iniziale e cognome</span></label>
         <label class="website-trap" aria-hidden="true">Sito web <input name="website" tabindex="-1" autocomplete="off"></label>
-        <div class="form-footer"><p>Il tuo nome e le tue scelte saranno visibili alla Commissione Orientamento, non nell’elenco pubblico delle scuole.</p><button type="submit">Invia disponibilità</button></div>
+        <div class="form-footer"><p>Nome e scelte arrivano solo alla Commissione Orientamento. In classifica compaiono iniziale, cognome e punti, se lo scegli.</p><button type="submit">Mi candido 🚀</button></div>
         <p class="form-message" id="supporterMessage" role="status" aria-live="polite"></p>
       </form>
     </section>
 
     <section class="support-section accent-section" id="mattinee" aria-labelledby="mattinee-title">
-      <div class="support-heading"><span class="section-number">02</span><div><p class="eyebrow">La scuola si apre</p><h2 id="mattinee-title">Proponi una Mattinée diffusa</h2><p>Un laboratorio, una lezione aperta o un’esperienza concreta per far conoscere ai ragazzi la vita della scuola a Decimomannu. La Commissione valuterà la proposta prima di programmare l’attività.</p></div></div>
+      <div class="support-heading"><span class="section-number">02</span><div><p class="eyebrow">La scuola si apre · +10 punti</p><h2 id="mattinee-title">Propongo una Mattinée diffusa</h2><p>Un laboratorio, una lezione aperta, un’esperienza pratica: i ragazzi delle medie vengono da noi e toccano con mano. Se la proposta viene approvata guadagni +10, se la realizzi +30.</p></div></div>
+      <div class="idea-strip" aria-label="Idee per iniziare">
+        <span>🧪 Esperimento dal vivo</span><span>🩺 Simulazione di primo soccorso</span><span>💻 Mini-hackathon</span><span>🍝 Laboratorio di accoglienza</span><span>🗺️ Caccia al tesoro tra i laboratori</span>
+      </div>
       <form id="proposalForm" class="support-form" novalidate>
         <div class="form-grid">
           <label>Nome del docente <input name="nome" autocomplete="given-name" maxlength="80" required></label>
           <label>Cognome del docente <input name="cognome" autocomplete="family-name" maxlength="80" required></label>
         </div>
-        <label>Titolo dell’attività <input name="titolo" maxlength="160" required placeholder="Un titolo breve e concreto"></label>
+        <label>Titolo dell’attività <input name="titolo" maxlength="160" required placeholder="Un titolo breve che faccia venire voglia di esserci"></label>
         <div class="form-grid">
           <label>Indirizzo o area disciplinare <input name="area" maxlength="120" required placeholder="Per esempio: Turismo, SSAS, Informatica"></label>
           <label>Tipologia
@@ -79,7 +143,7 @@
           </label>
         </div>
         <label>Che cosa faranno concretamente i ragazzi?
-          <textarea name="descrizione" rows="4" minlength="10" maxlength="1200" required></textarea>
+          <textarea name="descrizione" rows="4" minlength="10" maxlength="1200" required placeholder="Mani, occhi, testa: descrivi che cosa vedranno e faranno."></textarea>
         </label>
         <div class="form-grid">
           <label>Durata indicativa
@@ -91,16 +155,19 @@
         </div>
         <label>Spazi o attrezzature necessari <span class="optional">facoltativo</span><textarea name="esigenze" rows="2" maxlength="600"></textarea></label>
         <label>Note <span class="optional">facoltative</span><textarea name="nota" rows="2" maxlength="600"></textarea></label>
+        <label class="consent"><input type="checkbox" name="in_classifica" value="1"> <span>Sì, voglio comparire nella classifica pubblica con iniziale e cognome</span></label>
         <label class="website-trap" aria-hidden="true">Sito web <input name="website" tabindex="-1" autocomplete="off"></label>
-        <div class="form-footer"><p>La proposta sarà visibile alla Commissione Orientamento. Nessuna data viene fissata con questo invio.</p><button type="submit">Invia proposta</button></div>
+        <div class="form-footer"><p>La proposta arriva alla Commissione Orientamento, che la valuta e fissa date e spazi.</p><button type="submit">Invia la mia idea 💡</button></div>
         <p class="form-message" id="proposalMessage" role="status" aria-live="polite"></p>
       </form>
     </section>
 
-    <aside class="coordination-note"><strong>Coordinamento</strong><span>Prof. Salvatore Picconi · Commissione Orientamento</span></aside>
+    <aside class="coordination-note"><strong>Coordinamento</strong><span>Prof. Salvatore Picconi · Commissione Orientamento</span><span>I punti per visite e Mattinée realizzate vengono registrati dalla Commissione dopo ogni attività.</span></aside>
   </main>
 
+  <div class="celebration" id="celebration" aria-hidden="true"></div>
+
   <footer class="site-footer"><p>IIS Meucci - Mattei | Decimomannu</p><p>Questo spazio non sostituisce il sito istituzionale della scuola.</p></footer>
-  <script src="una-scuola-da-vivere.js?v=20260922-1"></script>
+  <script src="una-scuola-da-vivere.js?v=20260925-1"></script>
 </body>
 </html>

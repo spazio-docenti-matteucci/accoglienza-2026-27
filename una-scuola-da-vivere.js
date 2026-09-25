@@ -6,6 +6,24 @@ const supporterForm = document.getElementById('supporterForm');
 const proposalForm = document.getElementById('proposalForm');
 const schoolChoices = document.getElementById('schoolChoices');
 const schoolError = document.getElementById('schoolError');
+const schoolCounter = document.getElementById('schoolCounter');
+
+const BADGES = {
+  esploratore: ['🧭', 'Esploratore'],
+  ambasciatore: ['🌍', 'Ambasciatore'],
+  apripista: ['🚀', 'Apripista'],
+  idee: ['💡', 'Fucina di idee'],
+  laboratorio: ['🔬', 'Laboratorio aperto'],
+};
+const QUOTES = [
+  '“Un ragazzo sceglie la scuola in cui ha già visto qualcuno credere in lui.”',
+  '“Un’ora in una scuola media vale più di cento volantini.”',
+  '“Non portiamo brochure: portiamo il laboratorio, le mani, le persone.”',
+  '“Chi ci conosce in terza media ci ritrova in prima superiore.”',
+  '“Ogni docente che esce dalla sua aula apre una porta a qualcun altro.”',
+];
+
+let schoolStates = new Map();
 
 function setMessage(id, message, kind = '') {
   const element = document.getElementById(id);
@@ -37,11 +55,26 @@ function selectedSchools() {
   return [...schoolChoices.querySelectorAll('input:checked')].map((input) => input.value);
 }
 
+function updateSchoolCounter() {
+  const count = selectedSchools().length;
+  schoolCounter.textContent = `${count} di ${MAX_SCHOOLS} scelte`;
+  schoolCounter.classList.toggle('full', count === MAX_SCHOOLS);
+}
+
+function applySchoolStates() {
+  for (const option of schoolChoices.querySelectorAll('.school-option')) {
+    const state = schoolStates.get(option.dataset.school) || 'libera';
+    option.dataset.state = state;
+    const tag = option.querySelector('.school-tag');
+    tag.textContent = state === 'visitata' ? '✅ già visitata' : state === 'in_arrivo' ? '🔥 c’è chi va' : '✨ cerca un apripista';
+  }
+}
+
 function renderSchools(schools) {
   schoolChoices.replaceChildren();
   const groups = new Map();
   for (const school of schools) {
-    const key = school.area === 'esterno' ? 'Altri comuni dell’elenco operativo' : 'Comuni rappresentati nella mappa del bacino';
+    const key = school.area === 'esterno' ? 'Altri comuni dell’elenco operativo' : 'Comuni del bacino di Decimomannu';
     if (!groups.has(key)) groups.set(key, []);
     groups.get(key).push(school);
   }
@@ -56,6 +89,7 @@ function renderSchools(schools) {
     for (const school of items) {
       const label = document.createElement('label');
       label.className = 'school-option';
+      label.dataset.school = school.id;
       const input = document.createElement('input');
       input.type = 'checkbox';
       input.name = 'scuole';
@@ -65,17 +99,20 @@ function renderSchools(schools) {
       town.textContent = school.comune;
       const name = document.createElement('small');
       name.textContent = school.etichetta;
-      copy.append(town, name);
+      const tag = document.createElement('em');
+      tag.className = 'school-tag';
+      copy.append(town, name, tag);
       label.append(input, copy);
       grid.append(label);
     }
     section.append(grid);
     schoolChoices.append(section);
   }
+  applySchoolStates();
   schoolChoices.addEventListener('change', (event) => {
-    const selected = selectedSchools();
-    if (selected.length > MAX_SCHOOLS) event.target.checked = false;
+    if (selectedSchools().length > MAX_SCHOOLS) event.target.checked = false;
     schoolError.hidden = selectedSchools().length > 0;
+    updateSchoolCounter();
   });
 }
 
@@ -91,14 +128,143 @@ async function loadSchools() {
     }
     if (!Array.isArray(schools) || !schools.length) throw new Error();
     renderSchools(schools);
+    return schools;
   } catch {
     schoolChoices.textContent = 'L’elenco delle scuole non è disponibile. Riprova più tardi.';
     supporterForm.querySelector('button[type="submit"]').disabled = true;
+    return [];
   }
 }
 
+function setStat(name, value) {
+  for (const element of document.querySelectorAll(`[data-stat="${name}"]`)) element.textContent = String(value);
+}
+
+function renderLights(schools) {
+  const container = document.getElementById('schoolLights');
+  container.replaceChildren();
+  for (const school of schools) {
+    const light = document.createElement('span');
+    const state = schoolStates.get(school.id) || 'libera';
+    light.className = `light ${state === 'visitata' ? 'lit' : state === 'in_arrivo' ? 'warm' : ''}`;
+    light.textContent = school.comune;
+    light.title = `${school.comune} · ${school.etichetta}`;
+    container.append(light);
+  }
+}
+
+function renderMission(total, visited, offered) {
+  const percent = total ? Math.round((visited / total) * 100) : 0;
+  document.getElementById('missionBar').style.width = `${percent}%`;
+  const progress = document.getElementById('missionProgress');
+  progress.setAttribute('aria-valuemax', String(total));
+  progress.setAttribute('aria-valuenow', String(visited));
+  const caption = document.getElementById('missionCaption');
+  if (visited === 0) {
+    caption.textContent = offered
+      ? `Nessuna scuola ancora accesa, ma per ${offered} c’è già un docente pronto. Chi apre le danze?`
+      : 'La mappa è tutta spenta: il primo Apripista prende il bonus. 🚀';
+  } else if (visited === total) {
+    caption.textContent = 'Mappa completa: tutte le scuole raggiunte. Squadra leggendaria! 🎉';
+  } else {
+    caption.textContent = `${visited} su ${total} scuole raggiunte (${percent}%). Ne mancano ${total - visited}.`;
+  }
+}
+
+function badgeList(badges) {
+  const wrap = document.createElement('span');
+  wrap.className = 'badges';
+  for (const key of badges || []) {
+    const [icon, label] = BADGES[key] || [];
+    if (!icon) continue;
+    const badge = document.createElement('span');
+    badge.textContent = icon;
+    badge.title = label;
+    badge.setAttribute('aria-label', label);
+    wrap.append(badge);
+  }
+  return wrap;
+}
+
+function renderLeaderboard(entries) {
+  const podium = document.getElementById('podium');
+  const ranking = document.getElementById('ranking');
+  podium.replaceChildren();
+  ranking.replaceChildren();
+  document.getElementById('rankingEmpty').hidden = entries.length > 0;
+  const medals = ['🥇', '🥈', '🥉'];
+  entries.slice(0, 3).forEach((entry, index) => {
+    const card = document.createElement('article');
+    card.className = `podium-step step-${index + 1}`;
+    const medal = document.createElement('span');
+    medal.className = 'medal';
+    medal.textContent = medals[index];
+    const name = document.createElement('strong');
+    name.textContent = entry.nome;
+    const level = document.createElement('small');
+    level.textContent = entry.livello;
+    const points = document.createElement('b');
+    points.textContent = `${entry.punti} pt`;
+    card.append(medal, name, level, badgeList(entry.badge), points);
+    podium.append(card);
+  });
+  for (const entry of entries.slice(3)) {
+    const row = document.createElement('li');
+    const position = document.createElement('span');
+    position.className = 'pos';
+    position.textContent = String(entry.posizione);
+    const who = document.createElement('span');
+    who.className = 'who';
+    const name = document.createElement('strong');
+    name.textContent = entry.nome;
+    const level = document.createElement('small');
+    level.textContent = entry.livello;
+    who.append(name, level);
+    const points = document.createElement('b');
+    points.textContent = `${entry.punti} pt`;
+    row.append(position, who, badgeList(entry.badge), points);
+    ranking.append(row);
+  }
+}
+
+async function loadLeaderboard(schools) {
+  try {
+    if (previewCatalog) throw new Error();
+    const data = await send('leaderboard', {});
+    schoolStates = new Map(data.scuole.map((school) => [school.id, school.stato]));
+    for (const [key, value] of Object.entries(data.totali)) setStat(key, value);
+    renderMission(data.totali.scuole, data.totali.scuole_visitate, data.totali.scuole_con_disponibilita);
+    renderLeaderboard(data.classifica);
+  } catch {
+    for (const key of ['scuole_visitate', 'docenti', 'mattinee_proposte', 'punti']) setStat(key, 0);
+    setStat('scuole', schools.length || 24);
+    renderMission(schools.length || 24, 0, 0);
+    renderLeaderboard([]);
+  }
+  applySchoolStates();
+  renderLights(schools);
+}
+
+function celebrate() {
+  const layer = document.getElementById('celebration');
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  layer.replaceChildren();
+  const pieces = ['🎉', '⭐', '🚀', '✨', '🏆'];
+  for (let i = 0; i < 36; i += 1) {
+    const piece = document.createElement('span');
+    piece.textContent = pieces[i % pieces.length];
+    piece.style.left = `${Math.random() * 100}%`;
+    piece.style.animationDelay = `${Math.random() * 0.6}s`;
+    piece.style.fontSize = `${16 + Math.random() * 18}px`;
+    layer.append(piece);
+  }
+  setTimeout(() => layer.replaceChildren(), 3200);
+}
+
 function fields(form) {
-  return Object.fromEntries(new FormData(form).entries());
+  const data = Object.fromEntries(new FormData(form).entries());
+  data.in_classifica = form.elements.in_classifica.checked;
+  return data;
 }
 
 async function submitForm(event, action, messageId) {
@@ -124,8 +290,13 @@ async function submitForm(event, action, messageId) {
     const result = await send(action, data);
     form.reset();
     schoolError.hidden = true;
-    const noun = action === 'submit_supporter' ? 'Disponibilità ricevuta' : 'Proposta ricevuta';
-    setMessage(messageId, `${noun}. Codice ${result.codice}. La Commissione definirà successivamente attività, assegnazioni e date.`, 'success');
+    updateSchoolCounter();
+    const text = action === 'submit_supporter'
+      ? `Candidatura ricevuta, grazie! I +5 punti sono tuoi. Codice ${result.codice}. La Commissione ti ricontatterà per date e abbinamenti.`
+      : `Idea ricevuta, grazie! +10 punti per te. Codice ${result.codice}. La Commissione la valuterà e ti farà sapere.`;
+    setMessage(messageId, text, 'success');
+    celebrate();
+    loadLeaderboard(currentSchools);
   } catch (error) {
     setMessage(messageId, error.name === 'AbortError' ? 'La richiesta ha impiegato troppo tempo. Verifica prima di inviarla di nuovo.' : error.message, 'error');
   } finally {
@@ -133,6 +304,21 @@ async function submitForm(event, action, messageId) {
   }
 }
 
+function rotateQuotes() {
+  const quote = document.getElementById('quote');
+  let index = 0;
+  setInterval(() => {
+    index = (index + 1) % QUOTES.length;
+    quote.classList.add('fade');
+    setTimeout(() => { quote.textContent = QUOTES[index]; quote.classList.remove('fade'); }, 400);
+  }, 7000);
+}
+
+let currentSchools = [];
 supporterForm.addEventListener('submit', (event) => submitForm(event, 'submit_supporter', 'supporterMessage'));
 proposalForm.addEventListener('submit', (event) => submitForm(event, 'submit_proposal', 'proposalMessage'));
-loadSchools();
+loadSchools().then((schools) => {
+  currentSchools = schools;
+  return loadLeaderboard(schools);
+});
+rotateQuotes();
