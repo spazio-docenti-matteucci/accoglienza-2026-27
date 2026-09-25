@@ -29,6 +29,8 @@ function goTo(index) {
   nextButton.disabled = current === slides.length - 1;
   indexItems.querySelectorAll('button').forEach((button, buttonIndex) => {
     button.classList.toggle('active', buttonIndex === current);
+    if (buttonIndex === current) button.setAttribute('aria-current', 'step');
+    else button.removeAttribute('aria-current');
   });
   closeIndex();
 }
@@ -54,7 +56,14 @@ fullscreenButton.addEventListener('click', async () => {
   else await document.exitFullscreen?.();
 });
 
+document.addEventListener('fullscreenchange', () => {
+  const active = Boolean(document.fullscreenElement);
+  fullscreenButton.setAttribute('aria-pressed', String(active));
+  fullscreenButton.querySelector('span:last-child').textContent = active ? 'Esci da schermo intero' : 'Schermo intero';
+});
+
 document.addEventListener('keydown', (event) => {
+  if (event.target.closest('button, a, input, textarea, select')) return;
   if (['ArrowRight', 'PageDown', ' '].includes(event.key)) { event.preventDefault(); goTo(current + 1); }
   if (['ArrowLeft', 'PageUp'].includes(event.key)) { event.preventDefault(); goTo(current - 1); }
   if (event.key === 'Home') goTo(0);

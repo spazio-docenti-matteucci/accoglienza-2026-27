@@ -14,8 +14,8 @@ const activitySchool = document.getElementById('activitySchool');
 const activityMessage = document.getElementById('activityMessage');
 
 const PROPOSAL_TYPES = { laboratorio: 'Laboratorio', lezione_aperta: 'Lezione aperta', esperienza_pratica: 'Esperienza pratica', dimostrazione: 'Dimostrazione', interdisciplinare: 'Attività interdisciplinare', altro: 'Altro' };
-const SUPPORTER_STATES = { ricevuta: 'Da valutare', assegnata: 'Accettata', archiviata: 'Rimossa' };
-const PROPOSAL_STATES = { ricevuta: 'Da valutare', in_valutazione: 'In valutazione', approvata: 'Approvata', archiviata: 'Rimossa' };
+const SUPPORTER_STATES = { ricevuta: 'Da contattare', assegnata: 'Confermata', archiviata: 'Archiviata' };
+const PROPOSAL_STATES = { ricevuta: 'Da valutare', in_valutazione: 'In valutazione', approvata: 'Approvata', archiviata: 'Archiviata' };
 
 let sessionToken = sessionStorage.getItem(SESSION_KEY) || '';
 let data = null;
@@ -77,7 +77,7 @@ async function setState(kind, item, stato, button) {
   globalMessage.textContent = 'Salvataggio…';
   try {
     await api('update_contribution', { kind, id: item.id, stato });
-    globalMessage.textContent = `Fatto: ${item.nome} ${item.cognome} → ${(kind === 'supporter' ? SUPPORTER_STATES : PROPOSAL_STATES)[stato]}.`;
+    globalMessage.textContent = `Stato aggiornato per ${item.nome} ${item.cognome}: ${(kind === 'supporter' ? SUPPORTER_STATES : PROPOSAL_STATES)[stato]}.`;
     await load();
   } catch (error) {
     button.disabled = false;
@@ -105,7 +105,7 @@ function renderSummary() {
   const visited = new Set(data.attivita.filter((item) => item.tipo === 'visita').map((item) => item.scuola_id));
   for (const [value, label, hot] of [
     [pendingActivities, 'visite da confermare', pendingActivities > 0],
-    [pendingSupporters, 'candidature da valutare', pendingSupporters > 0],
+    [pendingSupporters, 'disponibilità da contattare', pendingSupporters > 0],
     [pendingProposals, 'proposte da valutare', pendingProposals > 0],
     [`${visited.size}/${data.scuole.length}`, 'scuole visitate', false],
     [data.attivita.length, 'attività confermate', false],
@@ -123,7 +123,7 @@ function renderSupporters(schoolNames) {
   const list = document.getElementById('supporterList');
   list.replaceChildren();
   const items = data.disponibilita.filter((item) => filters.candidature === 'tutte' || item.stato === filters.candidature);
-  if (!items.length) list.append(el('p', 'empty', 'Nessuna candidatura in questa sezione.'));
+  if (!items.length) list.append(el('p', 'empty', 'Non ci sono disponibilità in questa sezione.'));
   for (const item of items) {
     const card = el('article', 'review-card');
     const head = el('div', 'review-head');
@@ -134,9 +134,9 @@ function renderSupporters(schoolNames) {
     card.append(chips);
     if (item.nota) card.append(line('Nota', item.nota));
     const actions = el('div', 'review-actions');
-    if (item.stato !== 'assegnata') actions.append(actionButton('✓ Accetta', 'ok', (b) => setState('supporter', item, 'assegnata', b)));
-    if (item.stato !== 'archiviata') actions.append(actionButton('✕ Rimuovi', 'no', (b) => setState('supporter', item, 'archiviata', b)));
-    if (item.stato !== 'ricevuta') actions.append(actionButton('↺ Rimetti da valutare', 'neutral', (b) => setState('supporter', item, 'ricevuta', b)));
+    if (item.stato !== 'assegnata') actions.append(actionButton('Conferma disponibilità', 'ok', (b) => setState('supporter', item, 'assegnata', b)));
+    if (item.stato !== 'archiviata') actions.append(actionButton('Archivia', 'no', (b) => setState('supporter', item, 'archiviata', b)));
+    if (item.stato !== 'ricevuta') actions.append(actionButton('Riporta tra quelle da contattare', 'neutral', (b) => setState('supporter', item, 'ricevuta', b)));
     card.append(actions);
     list.append(card);
   }
@@ -160,10 +160,10 @@ function renderProposals() {
     if (item.esigenze) card.append(line('Spazi e attrezzature', item.esigenze));
     if (item.nota) card.append(line('Note', item.nota));
     const actions = el('div', 'review-actions');
-    if (item.stato !== 'approvata') actions.append(actionButton('✓ Approva', 'ok', (b) => setState('proposta', item, 'approvata', b)));
-    if (item.stato === 'ricevuta') actions.append(actionButton('⏳ In valutazione', 'neutral', (b) => setState('proposta', item, 'in_valutazione', b)));
-    if (item.stato !== 'archiviata') actions.append(actionButton('✕ Rimuovi', 'no', (b) => setState('proposta', item, 'archiviata', b)));
-    if (item.stato === 'archiviata' || item.stato === 'approvata') actions.append(actionButton('↺ Rimetti da valutare', 'neutral', (b) => setState('proposta', item, 'ricevuta', b)));
+    if (item.stato !== 'approvata') actions.append(actionButton('Approva proposta', 'ok', (b) => setState('proposta', item, 'approvata', b)));
+    if (item.stato === 'ricevuta') actions.append(actionButton('Segna in valutazione', 'neutral', (b) => setState('proposta', item, 'in_valutazione', b)));
+    if (item.stato !== 'archiviata') actions.append(actionButton('Archivia', 'no', (b) => setState('proposta', item, 'archiviata', b)));
+    if (item.stato === 'archiviata' || item.stato === 'approvata') actions.append(actionButton('Riporta tra quelle da valutare', 'neutral', (b) => setState('proposta', item, 'ricevuta', b)));
     card.append(actions);
     list.append(card);
   }
@@ -178,7 +178,7 @@ function renderSchools() {
     const accepted = candidates.filter((item) => item.stato === 'assegnata');
     const card = el('article', `school-card ${visits.length ? 'visited' : accepted.length ? 'accepted' : candidates.length ? 'offered' : ''}`);
     card.append(el('h4', '', school.comune), el('small', '', school.etichetta));
-    const status = visits.length ? `✅ Visitata (${visits.length})` : accepted.length ? '👍 Docente accettato' : candidates.length ? '🔥 Candidature da valutare' : '— Nessun candidato';
+    const status = visits.length ? `Visita svolta (${visits.length})` : accepted.length ? 'Disponibilità confermata' : candidates.length ? 'Disponibilità da contattare' : 'Nessuna disponibilità';
     card.append(el('p', 'school-status', status));
     const names = el('ul');
     for (const item of candidates) names.append(el('li', item.stato === 'assegnata' ? 'accepted' : '', `${item.nome} ${item.cognome}${item.stato === 'assegnata' ? ' ✓' : ''}`));
@@ -236,7 +236,7 @@ function renderActivities(schoolNames) {
 
 function activityCard(item, schoolNames, className = 'review-card') {
   const card = el('article', className);
-  card.append(el('h4', '', `${item.tipo === 'visita' ? '🧭 Visita' : '🔬 Mattinée'} · ${item.nome} ${item.cognome}`),
+    card.append(el('h4', '', `${item.tipo === 'visita' ? 'Visita' : 'Mattinée'} · ${item.nome} ${item.cognome}`),
     el('small', '', `Svolta il ${formatDate(`${item.data}T12:00:00`, false)} · registrata il ${formatDate(item.created_at)}`));
   if (item.tipo === 'visita') card.append(line('Scuola', schoolNames.get(item.scuola_id) || item.scuola_id));
   if (item.titolo) card.append(line('Titolo', item.titolo));
@@ -251,19 +251,19 @@ function renderPending(schoolNames) {
   for (const item of data.da_confermare) {
     const card = activityCard(item, schoolNames, 'review-card pending');
     const actions = el('div', 'review-actions');
-    actions.append(actionButton('✓ Conferma', 'ok', async (button) => {
+    actions.append(actionButton('Conferma attività', 'ok', async (button) => {
       button.disabled = true;
       globalMessage.textContent = 'Salvataggio…';
       try {
         await api('confirm_activity', { id: item.id });
-        globalMessage.textContent = `Confermata: ${item.nome} ${item.cognome}.`;
+        globalMessage.textContent = `Attività di ${item.nome} ${item.cognome} confermata.`;
         await load();
       } catch (error) {
         button.disabled = false;
         handleError(error);
       }
     }));
-    actions.append(actionButton('✕ Scarta', 'no', async (button) => {
+    actions.append(actionButton('Scarta registrazione', 'no', async (button) => {
       if (!window.confirm('Scartare questa registrazione? Non comparirà nell’elenco né in classifica.')) return;
       button.disabled = true;
       try {
@@ -308,7 +308,7 @@ function exportActivities() {
 function renderRanking() {
   const list = document.getElementById('adminRanking');
   list.replaceChildren();
-  if (!data.classifica.length) list.append(el('p', 'empty', 'Ancora nessun punto assegnato.'));
+  if (!data.classifica.length) list.append(el('p', 'empty', 'Non sono ancora presenti attività con punti assegnati.'));
   for (const entry of data.classifica) {
     const row = el('li');
     row.append(el('strong', '', `${entry.nome} ${entry.cognome}`),
@@ -395,7 +395,7 @@ activityForm.addEventListener('submit', async (event) => {
   activityMessage.textContent = 'Registrazione in corso…';
   try {
     await api('register_activity', payload);
-    activityMessage.textContent = `Registrato: punti assegnati a ${payload.nome} ${payload.cognome}.`;
+    activityMessage.textContent = `Attività registrata. I punti sono stati assegnati a ${payload.nome} ${payload.cognome}.`;
     for (const name of ['nome', 'cognome', 'nota', 'titolo']) activityForm.elements[name].value = '';
     activityForm.elements.in_classifica.checked = false;
     await load();

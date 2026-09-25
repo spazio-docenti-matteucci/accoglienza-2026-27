@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow, noarchive">
-  <meta name="description" content="Area riservata ai docenti della Commissione Orientamento dell’IIS Meucci - Mattei a Decimomannu.">
+  <meta name="description" content="Area riservata ai docenti della Commissione Orientamento dell’IIS Meucci–Mattei, sede di Decimomannu.">
   <title>Commissione Orientamento | Area riservata</title>
   <link rel="stylesheet" href="portal.css?v=20260922-2">
   <link rel="stylesheet" href="orientamento-modulo.css?v=20260925-1">
@@ -12,34 +12,34 @@
 <body>
   <header class="site-header">
     <a class="site-brand" href="index.html" aria-label="Torna alla pagina iniziale">
-      <span class="brandmark" aria-hidden="true">M</span>
-      <span><strong>IIS Meucci - Mattei | Decimomannu</strong><small>Accoglienza e orientamento</small></span>
+      <span class="context-logo" role="img" aria-label="IIS A. Meucci – E. Mattei, sede di Decimomannu"><img src="assets/decimomannu-cresce-qui-contesto.png" alt=""></span>
     </a>
     <nav class="page-nav" aria-label="Navigazione principale">
-      <a href="index.html">Home</a>
+      <a href="index.html">Pagina iniziale</a>
       <a href="accoglienza.html">Accoglienza</a>
     </nav>
   </header>
 
   <main class="orientation-main">
     <section class="orientation-hero">
-      <a class="back-link" href="index.html"><span aria-hidden="true">←</span> Torna alla scelta</a>
+      <a class="back-link" href="index.html"><span aria-hidden="true">←</span> Torna alla pagina iniziale</a>
       <p class="eyebrow">Area docenti · Accesso riservato</p>
       <h1>Commissione<br>Orientamento</h1>
-      <p>Materiali di lavoro della Commissione: presentazioni, analisi e documenti condivisi.</p>
+      <p>Presentazione dell’analisi demografica per l’orientamento a Decimomannu.</p>
+      <a class="supporter-page-link" href="una-scuola-da-vivere.html">Vai alle disponibilità e alle proposte dei docenti <span aria-hidden="true">→</span></a>
     </section>
 
     <section class="protected-shell" aria-labelledby="access-title">
       <div class="access-panel" id="loginPanel">
         <div class="lock-symbol" aria-hidden="true">🔒</div>
         <p class="step">Accesso commissione</p>
-        <h2 id="access-title">Inserisci la password</h2>
+        <h2 id="access-title">Accedi all’area riservata</h2>
         <p>La password è condivisa esclusivamente con i docenti della Commissione Orientamento.</p>
         <form class="password-form" id="passwordForm">
           <label for="orientationPassword">Password</label>
           <div class="password-row">
             <input id="orientationPassword" name="password" type="password" autocomplete="current-password" required>
-            <button type="submit">Entra</button>
+            <button type="submit">Accedi</button>
           </div>
           <p class="access-message" id="accessMessage" role="status" aria-live="polite"></p>
         </form>
@@ -47,11 +47,11 @@
 
       <div class="workspace-panel" id="workspacePanel" hidden>
         <div class="workspace-heading">
-          <div><p class="step">Commissione Orientamento</p><h2 id="workspaceTitle" tabindex="-1">Materiali della Commissione</h2></div>
+          <div><p class="step">Commissione Orientamento</p><h2 id="workspaceTitle" tabindex="-1">Analisi del bacino di Decimomannu</h2></div>
           <div class="workspace-session"><span class="role-badge" id="roleBadge"></span><button class="logout-button" id="logoutButton" type="button">Esci</button></div>
         </div>
 
-        <div class="documents-heading"><p class="step">Sezioni</p><h3>Scegli che cosa aprire</h3></div>
+        <div class="documents-heading"><p class="step">Presentazione</p><h3>Popolazione residente e coorti 2008–2013</h3></div>
         <div class="resource-grid" id="resourceGrid"></div>
 
       </div>
@@ -59,15 +59,15 @@
   </main>
 
   <div class="presentation-viewer" id="presentationViewer" role="dialog" aria-modal="true" aria-label="Presentazione del bacino" hidden>
-    <div class="presentation-toolbar"><strong id="presentationViewerTitle">Presentazione</strong><button id="closePresentation" type="button">Chiudi ×</button></div>
+    <div class="presentation-toolbar"><strong id="presentationViewerTitle">Presentazione</strong><button id="closePresentation" type="button">Chiudi presentazione</button></div>
     <p id="presentationViewerMessage" role="status"></p>
     <iframe id="presentationFrame" title="Presentazione del bacino" sandbox="allow-scripts allow-popups" referrerpolicy="no-referrer"></iframe>
   </div>
 
   <footer class="site-footer">
-    <p>IIS Meucci - Mattei | Decimomannu</p>
+    <p>IIS Meucci–Mattei, sede di Decimomannu</p>
     <p>Questo spazio non sostituisce il sito istituzionale della scuola.</p>
   </footer>
-  <script src="orientamento.js?v=20260925-3"></script>
+  <script src="orientamento.js?v=20260925-2"></script>
 </body>
 </html>

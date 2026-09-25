@@ -1,6 +1,5 @@
 .support-main { padding-bottom: 72px; }
 .support-hero { padding: clamp(52px, 7vw, 88px) clamp(28px, 6vw, 72px); position: relative; overflow: hidden; border-radius: 0 0 40px 40px; color: white; background: linear-gradient(135deg, #123c57 5%, #17666c 100%); box-shadow: 0 24px 60px rgb(18 60 87 / 15%); }
-.support-hero::after { content: ""; width: min(540px, 52vw); height: 220px; position: absolute; right: -35px; top: -14px; background: url("motivo-circolare.png") center / contain no-repeat; opacity: .75; pointer-events: none; }
 .support-hero > * { position: relative; z-index: 1; }
 .support-hero h1 { margin: 14px 0 22px; max-width: 750px; font-size: clamp(3.2rem, 8vw, 6rem); line-height: .88; letter-spacing: -.065em; }
 .support-hero h1 span { color: #c9f981; }
@@ -52,7 +51,6 @@
 @media (max-width: 650px) {
   .support-main { width: calc(100% - 24px); }
   .support-hero { padding: 44px 24px; border-radius: 0 0 27px 27px; }
-  .support-hero::after { width: 85vw; opacity: .35; }
   .support-section { padding: 24px 18px; border-radius: 22px; }
   .support-heading { grid-template-columns: 1fr; gap: 12px; }
   .form-grid, .school-grid { grid-template-columns: 1fr; }
@@ -141,13 +139,22 @@
 
 @media (max-width: 950px) { .points-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .points-grid article.bonus { grid-column: 1 / -1; } }
 @media (max-width: 650px) {
-  .hero-stats > div { flex: 1 1 100%; }
+  .hero-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
+  .hero-stats > div { min-width: 0; padding: 11px 9px; }
+  .hero-stats strong { font-size: 1.75rem; }
+  .hero-stats span { font-size: .68rem; line-height: 1.25; }
   .mission, .rules, .leaderboard { padding: 24px 18px; border-radius: 22px; }
   .points-grid, .podium { grid-template-columns: 1fr; }
   .podium-step { min-height: 0 !important; order: 0 !important; }
   .leaderboard-heading { align-items: stretch; flex-direction: column; }
   .ranking li { grid-template-columns: 30px 1fr auto; }
   .ranking li .badges { display: none; }
+}
+@media (min-width: 351px) and (max-width: 650px) {
+  .hero-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hero-actions a { display: grid; place-items: center; padding-inline: 10px; text-align: center; }
+  .school-grid, .points-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .points-grid article.bonus { grid-column: 1 / -1; }
 }
 @media (prefers-reduced-motion: reduce) { .progress span, .quote-band p { transition: none; } }
 

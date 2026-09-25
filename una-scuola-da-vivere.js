@@ -19,11 +19,11 @@ const BADGES = {
   laboratorio: ['🔬', 'Laboratorio aperto'],
 };
 const QUOTES = [
-  '“Un ragazzo sceglie la scuola in cui ha già visto qualcuno credere in lui.”',
-  '“Un’ora in una scuola media vale più di cento volantini.”',
-  '“Non portiamo brochure: portiamo il laboratorio, le mani, le persone.”',
-  '“Chi ci conosce in terza media ci ritrova in prima superiore.”',
-  '“Ogni docente che esce dalla sua aula apre una porta a qualcun altro.”',
+  'Le visite registrate entrano nel riepilogo della Funzione Strumentale.',
+  'Le disponibilità vengono abbinate dalla Funzione Strumentale.',
+  'Le proposte Mattinée vengono valutate dalla Commissione Orientamento.',
+  'La classifica pubblica mostra soltanto chi ha dato il consenso.',
+  'Dopo ogni attività, compila il modulo di registrazione.',
 ];
 
 let schoolStates = new Map();
@@ -32,7 +32,10 @@ function setMessage(id, message, kind = '') {
   const element = document.getElementById(id);
   element.textContent = message;
   element.className = `form-message ${kind}`;
-  if (message) element.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  if (message) {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    element.scrollIntoView({ block: 'nearest', behavior: reducedMotion ? 'auto' : 'smooth' });
+  }
 }
 
 async function send(action, data) {
@@ -47,7 +50,7 @@ async function send(action, data) {
       signal: controller.signal,
     });
     const result = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(result.error || 'Invio non riuscito. Riprova più tardi.');
+    if (!response.ok) throw new Error(result.error || 'Non è stato possibile inviare i dati. Riprova.');
     return result;
   } finally {
     clearTimeout(timeout);
@@ -69,7 +72,7 @@ function applySchoolStates() {
     const state = schoolStates.get(option.dataset.school) || 'libera';
     option.dataset.state = state;
     const tag = option.querySelector('.school-tag');
-    tag.textContent = state === 'visitata' ? '✅ già visitata' : state === 'in_arrivo' ? '🔥 c’è chi va' : '✨ cerca un apripista';
+    tag.textContent = state === 'visitata' ? 'Già visitata' : state === 'in_arrivo' ? 'Disponibilità presente' : 'Nessuna disponibilità';
   }
 }
 
@@ -194,10 +197,10 @@ function renderMission(total, visited, offered) {
   const caption = document.getElementById('missionCaption');
   if (visited === 0) {
     caption.textContent = offered
-      ? `Nessuna scuola ancora accesa, ma per ${offered} c’è già un docente pronto. Chi apre le danze?`
-      : 'La mappa è tutta spenta: il primo Apripista prende il bonus. 🚀';
+      ? `Nessuna scuola è stata ancora visitata. Per ${offered} ${offered === 1 ? 'scuola è già presente una disponibilità' : 'scuole sono già presenti disponibilità'}.`
+      : 'Nessuna scuola è stata ancora visitata.';
   } else if (visited === total) {
-    caption.textContent = 'Mappa completa: tutte le scuole raggiunte. Squadra leggendaria! 🎉';
+    caption.textContent = 'Tutte le scuole dell’elenco sono state raggiunte.';
   } else {
     caption.textContent = `${visited} su ${total} scuole raggiunte (${percent}%). Ne mancano ${total - visited}.`;
   }
@@ -327,15 +330,15 @@ async function submitForm(event, action, messageId) {
     updateSchoolCounter();
     if (action === 'report_activity') resetReportForm();
     const text = {
-      submit_supporter: `Candidatura ricevuta, grazie! I +5 punti sono tuoi. Codice ${result.codice}. La Funzione Strumentale ti ricontatterà per date e abbinamenti.`,
-      submit_proposal: `Idea ricevuta, grazie! +10 punti per te. Codice ${result.codice}. La Commissione la valuterà e ti farà sapere.`,
-      report_activity: `Registrazione ricevuta, grazie! Codice ${result.codice}. Dopo la conferma della Funzione Strumentale l’attività entra nell’elenco per la Dirigente e i punti compaiono in classifica.`,
+      submit_supporter: `Disponibilità inviata. Hai ricevuto 5 punti. Codice: ${result.codice}. La Funzione Strumentale ti contatterà per definire assegnazione, data e orario.`,
+      submit_proposal: `Proposta inviata. Hai ricevuto 10 punti. Codice: ${result.codice}. Se la proposta viene approvata riceverai altri 10 punti; la Commissione ti comunicherà l’esito.`,
+      report_activity: `Attività registrata. Codice: ${result.codice}. Dopo la conferma della Funzione Strumentale entrerà nell’elenco per la Dirigente e i punti saranno aggiornati.`,
     }[action];
     setMessage(messageId, text, 'success');
     celebrate();
     loadLeaderboard(currentSchools);
   } catch (error) {
-    setMessage(messageId, error.name === 'AbortError' ? 'La richiesta ha impiegato troppo tempo. Verifica prima di inviarla di nuovo.' : error.message, 'error');
+    setMessage(messageId, error.name === 'AbortError' ? 'La richiesta non ha ricevuto risposta. Prima di riprovare, verifica se la registrazione è già stata acquisita.' : error.message, 'error');
   } finally {
     button.disabled = false;
   }

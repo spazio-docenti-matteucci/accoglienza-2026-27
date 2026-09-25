@@ -17,6 +17,7 @@ const closePresentationButton = document.getElementById('closePresentation');
 
 let sessionToken = sessionStorage.getItem(SESSION_KEY) || '';
 let accessLevel = '';
+let presentationTrigger = null;
 
 async function api(action, payload = {}, formData = null) {
   const headers = {};
@@ -34,7 +35,7 @@ async function api(action, payload = {}, formData = null) {
   const response = await fetch(API_URL, { method: 'POST', headers, body });
   const result = await response.json().catch(() => ({}));
   if (!response.ok) {
-    const error = new Error(result.error || 'Operazione non riuscita.');
+    const error = new Error(result.error || 'Non è stato possibile completare l’operazione. Riprova.');
     error.status = response.status;
     throw error;
   }
@@ -55,7 +56,7 @@ function setAuthenticated(level) {
 }
 
 function resetSession() {
-  closePresentation();
+  closePresentation(false);
   sessionToken = '';
   accessLevel = '';
   sessionStorage.removeItem(SESSION_KEY);
@@ -64,9 +65,11 @@ function resetSession() {
   loginPanel.hidden = false;
 }
 
-function closePresentation() {
+function closePresentation(restoreFocus = true) {
   presentationFrame.removeAttribute('srcdoc');
   presentationViewer.hidden = true;
+  if (restoreFocus) (presentationTrigger || document.getElementById('workspaceTitle')).focus();
+  presentationTrigger = null;
 }
 
 async function openPresentation(item) {
@@ -111,7 +114,10 @@ function renderDocument(item) {
   const actions = document.createElement('div');
   actions.className = 'document-actions';
   if (item.kind === 'presentation') {
-    const openButton = createActionButton('Apri presentazione', 'presentation-open', () => openPresentation(item));
+    const openButton = createActionButton('Apri presentazione', 'presentation-open', () => {
+      presentationTrigger = openButton;
+      openPresentation(item);
+    });
     actions.append(openButton);
   } else if (item.url) {
     const openLink = document.createElement('a');
@@ -122,7 +128,7 @@ function renderDocument(item) {
     actions.append(openLink);
   } else {
     const unavailable = document.createElement('span');
-    unavailable.textContent = 'File non disponibile';
+    unavailable.textContent = 'Il file non è disponibile.';
     actions.append(unavailable);
   }
 
@@ -131,18 +137,20 @@ function renderDocument(item) {
 }
 
 async function loadDocuments() {
-  resourceGrid.textContent = 'Caricamento dei materiali…';
+  resourceGrid.textContent = 'Caricamento della presentazione…';
   try {
     const result = await api('list');
     resourceGrid.replaceChildren();
     if (!result.documents.length) {
       const empty = document.createElement('p');
       empty.className = 'resource-empty';
-      empty.textContent = 'Nessun materiale disponibile.';
+      empty.textContent = 'Non ci sono presentazioni disponibili.';
       resourceGrid.append(empty);
       return;
     }
     result.documents.forEach((item) => resourceGrid.append(renderDocument(item)));
+    const presentation = result.documents.find((item) => item.kind === 'presentation');
+    if (presentation) await openPresentation(presentation);
   } catch (error) {
     if (error.status === 401) resetSession();
     else resourceGrid.textContent = error.message;

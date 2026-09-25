@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow, noarchive">
-  <meta name="description" content="Area di gestione dell’orientamento riservata alla Funzione Strumentale dell’IIS Meucci - Mattei a Decimomannu.">
-  <title>Gestione orientamento | IIS Meucci - Mattei</title>
+  <meta name="description" content="Area di gestione dell’orientamento riservata alla Funzione Strumentale dell’IIS Meucci–Mattei, sede di Decimomannu.">
+  <title>Gestione orientamento | IIS Meucci–Mattei, sede di Decimomannu</title>
   <link rel="stylesheet" href="portal.css?v=20260922-2">
   <link rel="stylesheet" href="orientamento-modulo.css?v=20260925-1">
   <link rel="stylesheet" href="gestione.css?v=20260925-2">
@@ -13,11 +13,10 @@
 <body>
   <header class="site-header">
     <a class="site-brand" href="index.html" aria-label="Torna alla pagina iniziale">
-      <span class="brandmark" aria-hidden="true">M</span>
-      <span><strong>IIS Meucci - Mattei | Decimomannu</strong><small>Accoglienza e orientamento</small></span>
+      <span class="context-logo" role="img" aria-label="IIS A. Meucci – E. Mattei, sede di Decimomannu"><img src="assets/decimomannu-cresce-qui-contesto.png" alt=""></span>
     </a>
     <nav class="page-nav" aria-label="Navigazione principale">
-      <a href="una-scuola-da-vivere.html">Pagina pubblica</a>
+      <a href="una-scuola-da-vivere.html">Pagina dei docenti</a>
     </nav>
   </header>
 
@@ -25,20 +24,20 @@
     <section class="orientation-hero">
       <p class="eyebrow">Una scuola da vivere · Area della Funzione Strumentale</p>
       <h1>Gestione<br>orientamento</h1>
-      <p>Qui arriva tutto: candidature per le scuole, proposte di Mattinée, visite svolte e classifica. Ogni cosa ha la sua sezione.</p>
+      <p>Consulta e gestisci disponibilità, proposte Mattinée, attività da confermare, scuole visitate e classifica.</p>
     </section>
 
     <section class="protected-shell" aria-labelledby="access-title">
       <div class="access-panel" id="loginPanel">
         <div class="lock-symbol" aria-hidden="true">🔒</div>
         <p class="step">Accesso Funzione Strumentale</p>
-        <h2 id="access-title">Inserisci la password</h2>
+        <h2 id="access-title">Accedi all’area riservata</h2>
         <p>Serve la password personale della Funzione Strumentale.</p>
         <form class="password-form" id="passwordForm">
           <label for="managePassword">Password</label>
           <div class="password-row">
             <input id="managePassword" name="password" type="password" autocomplete="current-password" required>
-            <button type="submit">Entra</button>
+            <button type="submit">Accedi</button>
           </div>
           <p class="access-message" id="accessMessage" role="status" aria-live="polite"></p>
         </form>
@@ -46,32 +45,32 @@
 
       <div class="manage-panel" id="workspacePanel" hidden>
         <div class="manage-top">
-          <div><p class="step">Gestione orientamento</p><h2 id="workspaceTitle" tabindex="-1">Tutto quello che è arrivato</h2></div>
-          <div class="manage-actions"><button id="refreshButton" type="button">↻ Aggiorna</button><button class="logout-button" id="logoutButton" type="button">Esci</button></div>
+          <div><p class="step">Gestione orientamento</p><h2 id="workspaceTitle" tabindex="-1">Attività e disponibilità ricevute</h2></div>
+          <div class="manage-actions"><button id="refreshButton" type="button">Aggiorna dati</button><button class="logout-button" id="logoutButton" type="button">Esci</button></div>
         </div>
         <p id="globalMessage" class="global-message" role="status" aria-live="polite"></p>
         <div class="contribution-summary" id="summary"></div>
 
         <nav class="tabs" role="tablist" aria-label="Sezioni">
-          <button role="tab" data-tab="confermare" aria-selected="true">Visite da confermare <span class="count" id="countConfermare"></span></button>
-          <button role="tab" data-tab="candidature" aria-selected="false">Candidature <span class="count" id="countCandidature"></span></button>
+          <button role="tab" data-tab="confermare" aria-selected="true">Attività da confermare <span class="count" id="countConfermare"></span></button>
+          <button role="tab" data-tab="candidature" aria-selected="false">Disponibilità docenti <span class="count" id="countCandidature"></span></button>
           <button role="tab" data-tab="proposte" aria-selected="false">Proposte Mattinée <span class="count" id="countProposte"></span></button>
           <button role="tab" data-tab="scuole" aria-selected="false">Scuole</button>
-          <button role="tab" data-tab="attivita" aria-selected="false">Visite svolte</button>
+          <button role="tab" data-tab="attivita" aria-selected="false">Attività confermate</button>
           <button role="tab" data-tab="classifica" aria-selected="false">Classifica</button>
         </nav>
 
         <section class="tab-panel" data-panel="confermare">
-          <p class="panel-help">Visite e Mattinée registrate dai docenti. <b>Conferma</b> se l’attività si è svolta: entra nell’elenco per la Dirigente e assegna i punti. <b>Scarta</b> se è un errore o un doppione.</p>
+          <p class="panel-help">Visite e Mattinée registrate dai docenti. <b>Conferma l’attività</b> se si è svolta: entrerà nell’elenco per la Dirigente e assegnerà i punti. <b>Scarta la registrazione</b> se è un errore o un doppione.</p>
           <div class="review-list" id="pendingList"></div>
         </section>
 
         <section class="tab-panel" data-panel="candidature" hidden>
-          <p class="panel-help">Docenti che si sono candidati per andare nelle scuole medie. <b>Accetta</b> chi confermi, <b>Rimuovi</b> chi non partecipa: sparisce dalla classifica e dal conteggio.</p>
+          <p class="panel-help">Docenti che hanno dato la disponibilità per le visite nelle scuole secondarie di primo grado. <b>Conferma</b> le disponibilità concordate; <b>archivia</b> quelle non più valide. Le disponibilità archiviate non compaiono nella classifica né nel conteggio.</p>
           <div class="filters" data-filter-for="candidature">
-            <button data-filter="ricevuta" aria-pressed="true">Da valutare</button>
-            <button data-filter="assegnata" aria-pressed="false">Accettate</button>
-            <button data-filter="archiviata" aria-pressed="false">Rimosse</button>
+            <button data-filter="ricevuta" aria-pressed="true">Da contattare</button>
+            <button data-filter="assegnata" aria-pressed="false">Confermate</button>
+            <button data-filter="archiviata" aria-pressed="false">Archiviate</button>
             <button data-filter="tutte" aria-pressed="false">Tutte</button>
           </div>
           <div class="review-list" id="supporterList"></div>
@@ -82,21 +81,21 @@
           <div class="filters" data-filter-for="proposte">
             <button data-filter="aperte" aria-pressed="true">Da valutare</button>
             <button data-filter="approvata" aria-pressed="false">Approvate</button>
-            <button data-filter="archiviata" aria-pressed="false">Rimosse</button>
+            <button data-filter="archiviata" aria-pressed="false">Archiviate</button>
             <button data-filter="tutte" aria-pressed="false">Tutte</button>
           </div>
           <div class="review-list" id="proposalList"></div>
         </section>
 
         <section class="tab-panel" data-panel="scuole" hidden>
-          <p class="panel-help">Per ogni scuola: chi si è candidato, chi è stato accettato e se la visita è già stata fatta.</p>
+          <p class="panel-help">Per ogni scuola trovi le disponibilità ricevute, quelle confermate e le visite già svolte.</p>
           <div class="school-board" id="schoolBoard"></div>
         </section>
 
         <section class="tab-panel" data-panel="attivita" hidden>
           <div class="export-bar">
             <p class="panel-help">Qui trovi tutte le attività confermate. Il pulsante scarica l’elenco per la Dirigente (docente, attività, scuola, data), da aprire con Excel.</p>
-            <button type="button" class="act ok" id="exportButton">⬇ Scarica elenco per la Dirigente</button>
+            <button type="button" class="act ok" id="exportButton">Scarica elenco CSV</button>
           </div>
           <p class="panel-help">Se un docente non ha registrato un’attività, puoi inserirla tu: risulta subito confermata. Visita +20 (+10 al primo docente in quella scuola), Mattinée realizzata +30.</p>
           <form id="activityForm" class="activity-form">
@@ -130,7 +129,7 @@
   </main>
 
   <footer class="site-footer">
-    <p>IIS Meucci - Mattei | Decimomannu</p>
+    <p>IIS Meucci–Mattei, sede di Decimomannu</p>
     <p>Area riservata alla Funzione Strumentale per l’orientamento.</p>
   </footer>
   <script src="gestione.js?v=20260925-2"></script>

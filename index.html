@@ -3,31 +3,38 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Materiali per accoglienza e orientamento dell’IIS Meucci - Mattei a Decimomannu.">
-  <title>Accoglienza e orientamento | IIS Meucci - Mattei | Decimomannu</title>
+  <meta name="description" content="Spazio di accoglienza, partecipazione e orientamento curato dai docenti dell’IIS Meucci–Mattei, sede di Decimomannu.">
+  <title>Spazio di accoglienza e cura | IIS Meucci–Mattei, sede di Decimomannu</title>
   <link rel="stylesheet" href="portal.css?v=20260925-home">
 </head>
 <body>
-  <header class="site-header">
+  <header class="site-header home-header">
     <a class="site-brand" href="index.html" aria-label="Torna alla pagina iniziale">
-      <span class="brandmark" aria-hidden="true">M</span>
-      <span><strong>IIS Meucci - Mattei | Decimomannu</strong><small>Accoglienza e orientamento</small></span>
+      <span class="context-logo" role="img" aria-label="IIS A. Meucci – E. Mattei, sede di Decimomannu"><img src="assets/decimomannu-cresce-qui-contesto.png" alt=""></span>
     </a>
-    <p>Spazio operativo non ufficiale</p>
+    <p class="site-status"><span>Spazio curato dai docenti</span><a href="https://www.iismeuccimattei.edu.it/" target="_blank" rel="noopener">Sito istituzionale <span aria-hidden="true">↗</span></a></p>
   </header>
 
   <main>
     <section class="hero">
+      <picture class="hero-photo" aria-hidden="true">
+        <source media="(max-width: 760px)" srcset="assets/sede-decimomannu-900.webp">
+        <img src="assets/sede-decimomannu-1440.webp" width="1440" height="482" alt="" fetchpriority="high">
+      </picture>
       <div class="hero-copy">
-        <p class="eyebrow">Anno scolastico 2026/27</p>
-        <h1>Benvenuti<br><span>IIS Meucci - Mattei | Decimomannu</span></h1>
-        <p>Presentazioni, informazioni, attività e materiali per vivere e prenderci cura della nostra scuola: uno spazio in cui apprendere e crescere insieme.</p>
+        <p class="eyebrow">Accoglienza · partecipazione · orientamento</p>
+        <h1><span class="hero-title-main">Spazio di accoglienza<br>e cura</span><span class="hero-title-school">dell’IIS Meucci–Mattei,<br>sede di Decimomannu</span></h1>
+        <p class="hero-subtitle">Uno spazio per conoscere e partecipare.</p>
+        <aside class="hero-notice" aria-label="Informazione su questo spazio">
+          <span><strong>Uno spazio curato dai docenti.</strong> Non è il sito istituzionale e non lo sostituisce.</span>
+          <a href="https://www.iismeuccimattei.edu.it/" target="_blank" rel="noopener">Vai al sito ufficiale <span aria-hidden="true">↗</span></a>
+        </aside>
+        <p class="hero-intro">I docenti dell’IIS Meucci–Mattei, sede di Decimomannu, dedicano questo spazio di partecipazione a studenti, famiglie e docenti. Qui puoi conoscere i percorsi di studio, scoprire esperienze e attività, orientarti nelle scelte e trovare occasioni per vivere e partecipare insieme alla cura e alla crescita della nostra scuola.</p>
       </div>
-      <div class="hero-bubbles" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
     </section>
 
     <section class="groups-section" aria-labelledby="groups-title">
-      <div class="section-heading"><div><p class="step">Per chi</p><h2 id="groups-title">Chi sei?</h2></div></div>
+      <div class="section-heading"><div><p class="step">Per chi</p><h2 id="groups-title">Trova ciò che ti serve</h2></div></div>
       <nav class="group-jump" aria-label="Vai alla tua sezione">
         <a href="#studenti"><span aria-hidden="true">✦</span> Studenti</a>
         <a href="#famiglie"><span aria-hidden="true">⌂</span> Famiglie</a>
@@ -37,12 +44,12 @@
 
       <div class="group-grid">
         <section class="group-card group-studenti" id="studenti" aria-labelledby="studenti-title">
-          <header><span class="group-icon" aria-hidden="true">✦</span><div><h3 id="studenti-title">Studenti</h3><p>Per chi frequenta il Meucci - Mattei.</p></div></header>
+          <header><span class="group-icon" aria-hidden="true">✦</span><div><h3 id="studenti-title">Studenti</h3><p>Per chi frequenta l’IIS Meucci–Mattei, sede di Decimomannu.</p></div></header>
           <ul class="group-links">
             <li><a href="accoglienza.html"><strong>Accoglienza 2026/27</strong><span>Programma della prima giornata, orari e classi</span></a></li>
             <li><a href="documenti/accoglienza/Presentazione_accoglienza_studenti_Meucci_Mattei_2026-27.pdf" target="_blank" rel="noopener"><strong>Presentazione per studenti <span aria-hidden="true">↗</span></strong><span>La scuola in poche pagine (PDF)</span></a></li>
             <li><a href="indirizzi.html"><strong>Indirizzi di studio</strong><span>AFM, SIA, Turismo, SSAS e CAT Archeodesign</span></a></li>
-            <li><a href="curricoli.html"><strong>Curricoli dei corsi</strong><span>Competenze, conoscenze e attività per indirizzo</span></a></li>
+            <li><a href="curricoli.html"><strong>Curricoli disponibili</strong><span>È disponibile il curricolo SSAS</span></a></li>
           </ul>
         </section>
 
@@ -51,24 +58,25 @@
           <ul class="group-links">
             <li><a href="accoglienza.html"><strong>Accoglienza 2026/27</strong><span>Programma della prima giornata e organizzazione</span></a></li>
             <li><a href="indirizzi.html"><strong>Indirizzi di studio</strong><span>I percorsi attivi a Decimomannu</span></a></li>
-            <li><a href="curricoli.html"><strong>Curricoli dei corsi</strong><span>Che cosa si studia in ciascun indirizzo</span></a></li>
+            <li><a href="curricoli.html"><strong>Curricoli disponibili</strong><span>È disponibile il curricolo SSAS</span></a></li>
           </ul>
         </section>
 
         <section class="group-card group-docenti" id="docenti" aria-labelledby="docenti-title">
           <header><span class="group-icon" aria-hidden="true">●</span><div><h3 id="docenti-title">Docenti</h3><p>Orientamento, accoglienza e materiali di lavoro.</p></div></header>
           <ul class="group-links">
-            <li><a href="orientamento.html"><strong>Commissione Orientamento <span aria-hidden="true">🔒</span></strong><span>Area riservata con password</span></a></li>
+            <li><a href="una-scuola-da-vivere.html"><strong>Una scuola da vivere</strong><span>Disponibilità, proposte Mattinée e registrazione delle attività svolte</span></a></li>
+            <li><a href="orientamento.html"><strong>Commissione Orientamento</strong><span>Area riservata con password</span></a></li>
             <li><a href="accoglienza.html"><strong>Accoglienza 2026/27</strong><span>Programma della prima giornata</span></a></li>
-            <li><a href="curricoli.html"><strong>Curricoli dei corsi</strong><span>Competenze, conoscenze e attività per indirizzo</span></a></li>
+            <li><a href="curricoli.html"><strong>Curricoli disponibili</strong><span>È disponibile il curricolo SSAS</span></a></li>
           </ul>
         </section>
 
         <section class="group-card group-medie" id="medie" aria-labelledby="medie-title">
           <header><span class="group-icon" aria-hidden="true">★</span><div><h3 id="medie-title">Studenti delle medie</h3><p>Per chi sta scegliendo la scuola superiore.</p></div></header>
           <ul class="group-links">
-            <li><a href="indirizzi.html"><strong>Scopri i nostri indirizzi</strong><span>Cinque percorsi diurni e tre serali</span></a></li>
-            <li><a href="curricoli.html"><strong>Che cosa si studia</strong><span>Le materie e le attività di ogni corso</span></a></li>
+            <li><a href="indirizzi.html"><strong>Consulta gli indirizzi di studio</strong><span>Cinque percorsi diurni e tre serali</span></a></li>
+            <li><a href="curricoli.html"><strong>Curricoli disponibili</strong><span>È disponibile il curricolo SSAS</span></a></li>
             <li><a href="mailto:orientamattei@gmail.com?subject=Orientamento"><strong>Scrivi alla Commissione Orientamento</strong><span>orientamattei@gmail.com</span></a></li>
           </ul>
         </section>
@@ -77,8 +85,8 @@
   </main>
 
   <footer class="site-footer">
-    <p>IIS Meucci - Mattei | Decimomannu</p>
-    <p>Questo spazio non sostituisce il sito istituzionale della scuola.</p>
+    <p>IIS Meucci–Mattei, sede di Decimomannu</p>
+    <p>Spazio curato dai docenti · Non sostituisce il <a href="https://www.iismeuccimattei.edu.it/" target="_blank" rel="noopener">sito istituzionale <span aria-hidden="true">↗</span></a></p>
   </footer>
 </body>
 </html>

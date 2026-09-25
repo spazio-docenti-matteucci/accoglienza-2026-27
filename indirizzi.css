@@ -26,14 +26,6 @@
   mask-image: linear-gradient(90deg, transparent 30%, black 100%);
 }
 
-.study-hero::after {
-  width: min(710px, 57vw);
-  height: 275px;
-  top: -26px;
-  right: -68px;
-  opacity: .7;
-}
-
 .study-hero .back-link { margin-bottom: 32px; }
 
 .hero-layout {
@@ -395,7 +387,6 @@
   .study-hero { min-height: 610px; padding: 28px 22px 28px; border-radius: 0 0 30px 30px; }
   .study-hero .back-link { margin-bottom: 40px; }
   .study-hero .hero-copy h1 { font-size: clamp(3.25rem, 16vw, 4.7rem); }
-  .study-hero::after { width: 110vw; opacity: .35; }
   .route-summary a { min-height: 92px; padding: 17px; }
   .route-summary strong { font-size: 2.5rem; }
   .course-index { margin-top: 25px; }
