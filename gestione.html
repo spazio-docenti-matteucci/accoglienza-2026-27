@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="description" content="Area di gestione riservata al coordinamento dell’orientamento dell’IIS Meucci - Mattei a Decimomannu.">
+  <title>Gestione orientamento | IIS Meucci - Mattei</title>
+  <link rel="stylesheet" href="portal.css?v=20260922-2">
+  <link rel="stylesheet" href="orientamento-modulo.css?v=20260925-1">
+  <link rel="stylesheet" href="gestione.css?v=20260925-1">
+</head>
+<body>
+  <header class="site-header">
+    <a class="site-brand" href="index.html" aria-label="Torna alla pagina iniziale">
+      <span class="brandmark" aria-hidden="true">M</span>
+      <span><strong>IIS Meucci - Mattei | Decimomannu</strong><small>Accoglienza e orientamento</small></span>
+    </a>
+    <nav class="page-nav" aria-label="Navigazione principale">
+      <a href="una-scuola-da-vivere.html">Pagina pubblica</a>
+    </nav>
+  </header>
+
+  <main class="orientation-main">
+    <section class="orientation-hero">
+      <p class="eyebrow">Una scuola da vivere · Accesso riservato al coordinamento</p>
+      <h1>Gestione<br>orientamento</h1>
+      <p>Qui arriva tutto: candidature per le scuole, proposte di Mattinée, visite svolte e classifica. Ogni cosa ha la sua sezione.</p>
+    </section>
+
+    <section class="protected-shell" aria-labelledby="access-title">
+      <div class="access-panel" id="loginPanel">
+        <div class="lock-symbol" aria-hidden="true">🔒</div>
+        <p class="step">Accesso coordinamento</p>
+        <h2 id="access-title">Inserisci la password</h2>
+        <p>Serve la password di livello orientatore.</p>
+        <form class="password-form" id="passwordForm">
+          <label for="managePassword">Password</label>
+          <div class="password-row">
+            <input id="managePassword" name="password" type="password" autocomplete="current-password" required>
+            <button type="submit">Entra</button>
+          </div>
+          <p class="access-message" id="accessMessage" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+
+      <div class="manage-panel" id="workspacePanel" hidden>
+        <div class="manage-top">
+          <div><p class="step">Gestione orientamento</p><h2 id="workspaceTitle" tabindex="-1">Tutto quello che è arrivato</h2></div>
+          <div class="manage-actions"><button id="refreshButton" type="button">↻ Aggiorna</button><button class="logout-button" id="logoutButton" type="button">Esci</button></div>
+        </div>
+        <p id="globalMessage" class="global-message" role="status" aria-live="polite"></p>
+        <div class="contribution-summary" id="summary"></div>
+
+        <nav class="tabs" role="tablist" aria-label="Sezioni">
+          <button role="tab" data-tab="candidature" aria-selected="true">Candidature <span class="count" id="countCandidature"></span></button>
+          <button role="tab" data-tab="proposte" aria-selected="false">Proposte Mattinée <span class="count" id="countProposte"></span></button>
+          <button role="tab" data-tab="scuole" aria-selected="false">Scuole</button>
+          <button role="tab" data-tab="attivita" aria-selected="false">Registra visite</button>
+          <button role="tab" data-tab="classifica" aria-selected="false">Classifica</button>
+        </nav>
+
+        <section class="tab-panel" data-panel="candidature">
+          <p class="panel-help">Docenti che si sono candidati per andare nelle scuole medie. <b>Accetta</b> chi confermi, <b>Rimuovi</b> chi non partecipa: sparisce dalla classifica e dal conteggio.</p>
+          <div class="filters" data-filter-for="candidature">
+            <button data-filter="ricevuta" aria-pressed="true">Da valutare</button>
+            <button data-filter="assegnata" aria-pressed="false">Accettate</button>
+            <button data-filter="archiviata" aria-pressed="false">Rimosse</button>
+            <button data-filter="tutte" aria-pressed="false">Tutte</button>
+          </div>
+          <div class="review-list" id="supporterList"></div>
+        </section>
+
+        <section class="tab-panel" data-panel="proposte" hidden>
+          <p class="panel-help">Laboratori e lezioni aperte proposti dai docenti. <b>Approva</b> vale +10 punti al docente.</p>
+          <div class="filters" data-filter-for="proposte">
+            <button data-filter="aperte" aria-pressed="true">Da valutare</button>
+            <button data-filter="approvata" aria-pressed="false">Approvate</button>
+            <button data-filter="archiviata" aria-pressed="false">Rimosse</button>
+            <button data-filter="tutte" aria-pressed="false">Tutte</button>
+          </div>
+          <div class="review-list" id="proposalList"></div>
+        </section>
+
+        <section class="tab-panel" data-panel="scuole" hidden>
+          <p class="panel-help">Per ogni scuola: chi si è candidato, chi è stato accettato e se la visita è già stata fatta.</p>
+          <div class="school-board" id="schoolBoard"></div>
+        </section>
+
+        <section class="tab-panel" data-panel="attivita" hidden>
+          <p class="panel-help">Dopo ogni visita o Mattinée realizzata, registrala qui: i punti e la mappa pubblica si aggiornano da soli. Visita +20 (+10 al primo docente in quella scuola), Mattinée realizzata +30.</p>
+          <form id="activityForm" class="activity-form">
+            <label>Nome <input name="nome" list="teacherNames" maxlength="80" required></label>
+            <label>Cognome <input name="cognome" list="teacherSurnames" maxlength="80" required></label>
+            <label>Attività
+              <select name="tipo" id="activityType" required>
+                <option value="visita">Visita in una scuola</option>
+                <option value="mattinee">Mattinée diffusa realizzata</option>
+              </select>
+            </label>
+            <label id="activitySchoolField">Scuola <select name="scuola_id" id="activitySchool"></select></label>
+            <label id="activityTitleField" hidden>Titolo della Mattinée <input name="titolo" maxlength="160"></label>
+            <label>Data <input name="data" type="date" required></label>
+            <label class="activity-wide">Nota <span>facoltativa</span><input name="nota" maxlength="600"></label>
+            <label class="activity-check"><input type="checkbox" name="in_classifica"> Il docente acconsente a comparire nella classifica pubblica</label>
+            <button type="submit">Registra e assegna i punti</button>
+          </form>
+          <datalist id="teacherNames"></datalist><datalist id="teacherSurnames"></datalist>
+          <p id="activityMessage" class="global-message" role="status" aria-live="polite"></p>
+          <h3 class="sub-title">Attività registrate</h3>
+          <div class="review-list" id="activityList"></div>
+        </section>
+
+        <section class="tab-panel" data-panel="classifica" hidden>
+          <p class="panel-help">Classifica completa con tutti i nomi. In quella pubblica compaiono solo i docenti che hanno dato il consenso, con iniziale e cognome.</p>
+          <ol class="full-ranking" id="adminRanking"></ol>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>IIS Meucci - Mattei | Decimomannu</p>
+    <p>Area riservata al coordinamento dell’orientamento.</p>
+  </footer>
+  <script src="gestione.js?v=20260925-1"></script>
+</body>
+</html>

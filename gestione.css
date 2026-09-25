@@ -1,0 +1,53 @@
+.manage-panel { max-width: 1120px; margin: 0 auto; padding: clamp(22px, 4vw, 44px); border: 1px solid var(--line); border-radius: 30px; background: white; box-shadow: 0 18px 45px rgb(18 60 87 / 9%); }
+.manage-top { display: flex; justify-content: space-between; align-items: flex-end; gap: 18px; }
+.manage-top h2 { margin: 6px 0 0; color: var(--navy); font-size: clamp(1.6rem, 3.4vw, 2.4rem); letter-spacing: -.04em; }
+.manage-actions { display: flex; gap: 8px; }
+.manage-actions button { padding: 10px 15px; border: 1px solid var(--line); border-radius: 11px; color: var(--navy); background: #fff; cursor: pointer; font-size: .8rem; font-weight: 800; }
+.manage-actions button:disabled { opacity: .5; }
+.global-message { min-height: 1.2em; margin: 12px 0 0; color: var(--navy); font-size: .84rem; font-weight: 700; }
+.contribution-summary > div.hot { border-color: #f3b35b; background: #fff3e0; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 18px; padding: 6px; border-radius: 16px; background: #eef4f6; }
+.tabs button { flex: 1 1 auto; padding: 11px 14px; border: 0; border-radius: 11px; color: var(--navy); background: transparent; cursor: pointer; font: inherit; font-size: .84rem; font-weight: 800; }
+.tabs button[aria-selected="true"] { background: #fff; box-shadow: 0 3px 10px rgb(18 60 87 / 10%); }
+.tabs .count:not(:empty) { display: inline-grid; min-width: 22px; height: 22px; margin-left: 6px; padding: 0 6px; place-items: center; border-radius: 99px; color: white; background: #bb0c50; font-size: .72rem; }
+.panel-help { margin: 0 0 14px; color: var(--muted); font-size: .86rem; line-height: 1.5; }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.filters button { padding: 8px 13px; border: 1px solid var(--line); border-radius: 99px; color: var(--navy); background: #fff; cursor: pointer; font: inherit; font-size: .78rem; font-weight: 800; }
+.filters button[aria-pressed="true"] { border-color: var(--navy); color: white; background: var(--navy); }
+.review-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.review-card { padding: 18px; border: 1px solid var(--line); border-radius: 16px; background: #fafcfc; overflow-wrap: anywhere; }
+.review-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.review-card h4 { margin: 0 0 4px; color: var(--navy); font-size: 1.02rem; }
+.review-card small { color: var(--muted); font-size: .72rem; }
+.review-card p { margin: 10px 0 0; color: var(--ink); font-size: .84rem; line-height: 1.45; }
+.review-card p strong { color: var(--navy); }
+.state { flex: 0 0 auto; padding: 4px 9px; border-radius: 99px; font-size: .7rem; font-weight: 900; }
+.state-ricevuta, .state-in_valutazione { color: #8a4b00; background: #fff3e0; }
+.state-assegnata, .state-approvata { color: #095d33; background: #e4f5e9; }
+.state-archiviata { color: #6b7c88; background: #eef1f3; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.chips span { padding: 5px 9px; border-radius: 99px; color: var(--navy); background: #e8f1f4; font-size: .74rem; font-weight: 700; }
+.review-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.act { padding: 9px 13px; border: 1px solid transparent; border-radius: 10px; cursor: pointer; font: inherit; font-size: .78rem; font-weight: 850; }
+.act.ok { color: white; background: var(--green); }
+.act.no { color: #9b1930; border-color: #e6b9c2; background: #fff; }
+.act.neutral { color: var(--navy); border-color: var(--line); background: #fff; }
+.act:disabled { opacity: .5; cursor: wait; }
+.empty { grid-column: 1 / -1; margin: 0; padding: 22px; border: 2px dashed #d3e0e4; border-radius: 14px; color: var(--muted); text-align: center; font-weight: 700; }
+.school-board { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.school-card { padding: 14px; border: 1px solid var(--line); border-radius: 14px; background: #f5f7f8; }
+.school-card.offered { border-color: #f3c98f; background: #fff7ec; }
+.school-card.accepted { border-color: #b9e3c7; background: #eef8f1; }
+.school-card.visited { border-color: var(--green); background: #e4f5e9; }
+.school-card h4 { margin: 0; color: var(--navy); font-size: .95rem; }
+.school-card small { color: var(--muted); font-size: .72rem; }
+.school-status { margin: 8px 0 0; color: var(--navy); font-size: .78rem; font-weight: 800; }
+.school-card ul { margin: 8px 0 0; padding-left: 18px; color: var(--muted); font-size: .78rem; }
+.school-card li.accepted { color: #095d33; font-weight: 800; }
+.sub-title { margin: 26px 0 12px; color: var(--navy); font-size: 1rem; }
+.full-ranking { display: grid; gap: 8px; margin: 0; padding-left: 24px; }
+.full-ranking li { padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: #fafcfc; }
+.full-ranking strong { display: block; color: var(--navy); }
+.full-ranking span { color: var(--muted); font-size: .76rem; }
+@media (max-width: 850px) { .review-list { grid-template-columns: 1fr; } .school-board { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 650px) { .manage-top { align-items: stretch; flex-direction: column; } .school-board { grid-template-columns: 1fr; } .tabs button { flex: 1 1 45%; } }

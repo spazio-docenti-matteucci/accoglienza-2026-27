@@ -9,7 +9,7 @@ La pagina `una-scuola-da-vivere.html` è accessibile senza password. Nome, cogno
 scuole scelte e proposte sono inviati alla funzione Edge `orientamento`, che li
 salva in tabelle con RLS attivo e nessun accesso diretto per `anon` o
 `authenticated`. Solo una sessione `orientatore` può leggere i contributi e
-aggiornarne lo stato in `orientamento.html`. Il livello `supporter` dell’area
+aggiornarne lo stato in `gestione.html` (area di gestione separata dall’area documenti). Il livello `supporter` dell’area
 riservata non legge questi dati.
 
 L’elenco delle 24 scuole/sedi in 23 comuni deriva dal DOCX operativo la cui
@@ -51,9 +51,8 @@ dalla funzione Edge (azione pubblica `leaderboard`):
 | Primo docente a visitare una scuola (Apripista) | 10 |
 
 Le visite e le Mattinée realizzate sono registrate dalla Commissione in
-`orientamento.html` (password `orientatore`, riquadro “Registra un’attività
-svolta”) e finiscono nella tabella `orientamento_attivita`. Una registrazione
-errata si annulla dallo stesso riquadro. I contributi dello stesso docente si
+`gestione.html` (password `orientatore`, sezione “Registra visite”) e finiscono nella tabella `orientamento_attivita`. Una registrazione
+errata si annulla dalla stessa sezione. I contributi dello stesso docente si
 sommano confrontando nome e cognome senza accenti e maiuscole.
 
 In classifica pubblica compaiono solo iniziale e cognome dei docenti che hanno

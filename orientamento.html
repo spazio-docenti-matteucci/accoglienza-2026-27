@@ -55,42 +55,6 @@
         <div class="documents-heading"><p class="step">Presentazione</p><h3>Popolazione residente e coorti 2008–2013</h3></div>
         <div class="resource-grid" id="resourceGrid"></div>
 
-        <section class="contribution-panel" id="contributionPanel" aria-labelledby="contributionTitle" hidden>
-          <div class="contribution-heading"><div><p class="step">Una scuola da vivere</p><h3 id="contributionTitle">Disponibilità e Mattinée diffuse</h3><p>I nomi dei docenti e le proposte sono visibili solo nell’area di gestione della Commissione.</p></div><button id="refreshContributions" type="button">Aggiorna</button></div>
-          <p id="contributionMessage" role="status" aria-live="polite"></p>
-          <div class="contribution-summary" id="contributionSummary"></div>
-          <section class="activity-panel" aria-labelledby="activityTitle">
-            <h4 id="activityTitle">🏆 Registra un’attività svolta</h4>
-            <p>Ogni visita vale 20 punti (+10 al primo docente in quella scuola), ogni Mattinée realizzata 30. Scrivi nome e cognome come nel modulo del docente, così i punti si sommano.</p>
-            <form id="activityForm" class="activity-form">
-              <label>Nome <input name="nome" list="teacherNames" maxlength="80" required></label>
-              <label>Cognome <input name="cognome" list="teacherSurnames" maxlength="80" required></label>
-              <label>Attività
-                <select name="tipo" id="activityType" required>
-                  <option value="visita">Visita in una scuola</option>
-                  <option value="mattinee">Mattinée diffusa realizzata</option>
-                </select>
-              </label>
-              <label id="activitySchoolField">Scuola <select name="scuola_id" id="activitySchool"></select></label>
-              <label id="activityTitleField" hidden>Titolo della Mattinée <input name="titolo" maxlength="160"></label>
-              <label>Data <input name="data" type="date" required></label>
-              <label class="activity-wide">Nota <span>facoltativa</span><input name="nota" maxlength="600"></label>
-              <label class="activity-check"><input type="checkbox" name="in_classifica"> Il docente acconsente a comparire nella classifica pubblica</label>
-              <button type="submit">Registra e assegna i punti</button>
-            </form>
-            <datalist id="teacherNames"></datalist><datalist id="teacherSurnames"></datalist>
-            <p id="activityMessage" role="status" aria-live="polite"></p>
-            <div class="activity-columns">
-              <section><h5>Classifica completa</h5><ol id="adminRanking" class="admin-ranking"></ol></section>
-              <section><h5>Attività registrate</h5><div id="activityList" class="activity-list"></div></section>
-            </div>
-          </section>
-          <details class="coverage-details"><summary>Copertura delle scuole</summary><div class="coverage-grid" id="coverageGrid"></div></details>
-          <div class="contribution-columns">
-            <section aria-labelledby="supporterListTitle"><h4 id="supporterListTitle">Supporter per le scuole</h4><div id="supporterList" class="contribution-list"></div></section>
-            <section aria-labelledby="proposalListTitle"><h4 id="proposalListTitle">Proposte di laboratori e lezioni aperte</h4><div id="proposalList" class="contribution-list"></div></section>
-          </div>
-        </section>
       </div>
     </section>
   </main>
@@ -105,6 +69,6 @@
     <p>IIS Meucci - Mattei | Decimomannu</p>
     <p>Questo spazio non sostituisce il sito istituzionale della scuola.</p>
   </footer>
-  <script src="orientamento.js?v=20260925-1"></script>
+  <script src="orientamento.js?v=20260925-2"></script>
 </body>
 </html>
