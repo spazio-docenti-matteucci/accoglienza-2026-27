@@ -27,6 +27,7 @@ const PROPOSAL_DURATIONS = new Set([30, 45, 60, 90]);
 const ACTIVITY_TYPES = new Set(["visita", "mattinee"]);
 const ALLOWED_ORIGINS = new Set([
   "https://spazio-docenti-matteucci.github.io",
+  "https://spaziodocentimeuccimattei.github.io",
   "http://localhost:8765",
   "http://127.0.0.1:8765",
 ]);
