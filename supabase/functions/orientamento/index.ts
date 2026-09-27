@@ -25,21 +25,6 @@ const MAX_PUBLIC_REQUESTS_PER_DAY = 40;
 const PROPOSAL_TYPES = new Set(["laboratorio", "lezione_aperta", "esperienza_pratica", "dimostrazione", "interdisciplinare", "altro"]);
 const PROPOSAL_DURATIONS = new Set([30, 45, 60, 90]);
 const ACTIVITY_TYPES = new Set(["visita", "mattinee"]);
-const LEADERBOARD_SIZE = 10;
-const POINTS = {
-  disponibilita: 5,
-  proposta: 10,
-  proposta_approvata: 10,
-  visita: 20,
-  mattinee: 30,
-  apripista: 10,
-};
-const LEVELS: [number, string][] = [
-  [120, "Leggenda dell’orientamento"],
-  [60, "Mentore"],
-  [25, "Guida"],
-  [0, "Matricola"],
-];
 const ALLOWED_ORIGINS = new Set([
   "https://spazio-docenti-matteucci.github.io",
   "http://localhost:8765",
@@ -239,7 +224,7 @@ async function submitSupporter(request: Request, payload: Record<string, unknown
     if (!valid || valid.length !== scuole.length) throw new Error("L’elenco delle scuole è cambiato. Ricarica la pagina.");
     if (!await publicQuota(request)) return json(request, { error: "Troppe richieste da questa connessione. Riprova domani." }, 429);
     const { data, error } = await admin.from("orientamento_disponibilita")
-      .insert({ nome, cognome, scuole, nota, in_classifica: payload.in_classifica === true }).select("id").single();
+      .insert({ nome, cognome, scuole, nota }).select("id").single();
     if (error || !data) throw new PublicServiceError();
     return json(request, { ok: true, codice: confirmationCode(data.id) }, 201);
   } catch (error) {
@@ -259,15 +244,15 @@ async function submitProposal(request: Request, payload: Record<string, unknown>
     const nota = publicText(payload.nota ?? "", 0, 600);
     if (typeof payload.tipologia !== "string" || !PROPOSAL_TYPES.has(payload.tipologia)) throw new Error("Seleziona una tipologia di attività.");
     if (typeof payload.durata_minuti !== "number" || !PROPOSAL_DURATIONS.has(payload.durata_minuti)) throw new Error("Seleziona una durata indicativa.");
-    const partecipanti = payload.partecipanti === null || payload.partecipanti === "" || payload.partecipanti === undefined ? null : payload.partecipanti;
-    if (partecipanti !== null && (!Number.isInteger(partecipanti) || partecipanti < 1 || partecipanti > 200)) {
+    const rawPartecipanti = payload.partecipanti;
+    const partecipanti = rawPartecipanti === null || rawPartecipanti === "" || rawPartecipanti === undefined ? null : rawPartecipanti;
+    if (partecipanti !== null && (typeof partecipanti !== "number" || !Number.isInteger(partecipanti) || partecipanti < 1 || partecipanti > 200)) {
       throw new Error("Il numero di partecipanti non è valido.");
     }
     if (!await publicQuota(request)) return json(request, { error: "Troppe richieste da questa connessione. Riprova domani." }, 429);
     const { data, error } = await admin.from("orientamento_proposte")
       .insert({ nome, cognome, titolo, area, tipologia: payload.tipologia, descrizione,
-        durata_minuti: payload.durata_minuti, partecipanti, esigenze, nota,
-        in_classifica: payload.in_classifica === true })
+        durata_minuti: payload.durata_minuti, partecipanti, esigenze, nota })
       .select("id").single();
     if (error || !data) throw new PublicServiceError();
     return json(request, { ok: true, codice: confirmationCode(data.id) }, 201);
@@ -276,7 +261,7 @@ async function submitProposal(request: Request, payload: Record<string, unknown>
   }
 }
 
-type Person = { nome: string; cognome: string; in_classifica: boolean };
+type Person = { nome: string; cognome: string };
 type Supporter = Person & { scuole: string[]; stato: string; created_at: string };
 type Proposal = Person & { stato: string; created_at: string };
 type Activity = Person & { id: string; tipo: string; scuola_id: string | null; data: string; created_at: string };
@@ -285,83 +270,15 @@ function personKey(nome: string, cognome: string) {
   return `${nome} ${cognome}`.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().replace(/\s+/g, " ").trim();
 }
 
-function levelFor(points: number) {
-  return LEVELS.find(([threshold]) => points >= threshold)?.[1] ?? "Matricola";
-}
-
-// Punteggi calcolati sempre lato server: la pagina pubblica riceve solo i docenti che hanno acconsentito.
-function computeScores(supporters: Supporter[], proposals: Proposal[], activities: Activity[]) {
-  const people = new Map<string, {
-    nome: string; cognome: string; consenso: boolean; punti: number; disponibilita: boolean;
-    proposte: number; approvate: number; visite: number; mattinee: number; scuole: Set<string>; apripista: number;
-    ultimo: string;
-  }>();
-  const person = (item: Person, when: string) => {
-    const key = personKey(item.nome, item.cognome);
-    if (!people.has(key)) {
-      people.set(key, { nome: item.nome, cognome: item.cognome, consenso: false, punti: 0, disponibilita: false,
-        proposte: 0, approvate: 0, visite: 0, mattinee: 0, scuole: new Set(), apripista: 0, ultimo: when });
-    }
-    const entry = people.get(key)!;
-    if (item.in_classifica) entry.consenso = true;
-    if (when > entry.ultimo) entry.ultimo = when;
-    return entry;
-  };
-
-  for (const item of supporters) {
-    if (item.stato === "archiviata") continue;
-    person(item, item.created_at).disponibilita = true;
-  }
-  for (const item of proposals) {
-    if (item.stato === "archiviata") continue;
-    const entry = person(item, item.created_at);
-    entry.proposte += 1;
-    if (item.stato === "approvata") entry.approvate += 1;
-  }
-  const firstVisit = new Map<string, string>();
-  const ordered = [...activities].sort((a, b) => a.data.localeCompare(b.data) || a.created_at.localeCompare(b.created_at));
-  for (const item of ordered) {
-    const entry = person(item, item.created_at);
-    if (item.tipo === "mattinee") {
-      entry.mattinee += 1;
-      continue;
-    }
-    entry.visite += 1;
-    if (item.scuola_id) {
-      entry.scuole.add(item.scuola_id);
-      if (!firstVisit.has(item.scuola_id)) {
-        firstVisit.set(item.scuola_id, personKey(item.nome, item.cognome));
-        entry.apripista += 1;
-      }
-    }
-  }
-
-  const ranking = [...people.values()].map((entry) => {
-    const punti = (entry.disponibilita ? POINTS.disponibilita : 0) + entry.proposte * POINTS.proposta +
-      entry.approvate * POINTS.proposta_approvata + entry.visite * POINTS.visita +
-      entry.mattinee * POINTS.mattinee + entry.apripista * POINTS.apripista;
-    const badge: string[] = [];
-    if (entry.visite >= 1) badge.push("esploratore");
-    if (entry.scuole.size >= 3) badge.push("ambasciatore");
-    if (entry.apripista >= 1) badge.push("apripista");
-    if (entry.proposte >= 1) badge.push("idee");
-    if (entry.mattinee >= 1) badge.push("laboratorio");
-    return { ...entry, punti, badge, livello: levelFor(punti), scuole_visitate: entry.scuole.size };
-  }).filter((entry) => entry.punti > 0)
-    .sort((a, b) => b.punti - a.punti || b.visite - a.visite || a.ultimo.localeCompare(b.ultimo));
-
-  return { ranking, firstVisit };
-}
-
-async function loadScoreData() {
+async function loadParticipationData() {
   const [schools, supporter, proposals, activities] = await Promise.all([
     admin.from("orientamento_scuole").select("id,comune,etichetta,area,verificata").eq("attiva", true).order("ordine"),
-    admin.from("orientamento_disponibilita").select("id,nome,cognome,scuole,nota,stato,in_classifica,created_at").order("created_at", { ascending: false }).limit(500),
-    admin.from("orientamento_proposte").select("id,nome,cognome,titolo,area,tipologia,descrizione,durata_minuti,partecipanti,esigenze,nota,stato,in_classifica,created_at").order("created_at", { ascending: false }).limit(500),
-    admin.from("orientamento_attivita").select("id,nome,cognome,tipo,scuola_id,titolo,data,nota,in_classifica,stato,created_at").eq("archiviata", false).order("data", { ascending: false }).limit(1000),
+    admin.from("orientamento_disponibilita").select("id,nome,cognome,scuole,nota,stato,created_at").order("created_at", { ascending: false }).limit(500),
+    admin.from("orientamento_proposte").select("id,nome,cognome,titolo,area,tipologia,descrizione,durata_minuti,partecipanti,esigenze,nota,stato,created_at").order("created_at", { ascending: false }).limit(500),
+    admin.from("orientamento_attivita").select("id,nome,cognome,tipo,scuola_id,titolo,data,nota,stato,created_at").eq("archiviata", false).order("data", { ascending: false }).limit(1000),
   ]);
   if (schools.error || supporter.error || proposals.error || activities.error) throw new PublicServiceError();
-  // Solo le attività confermate dalla Funzione Strumentale contano per punti, mappa ed elenco.
+  // Solo le attività confermate dalla Funzione Strumentale entrano nella mappa e nel riepilogo.
   const allActivities = activities.data ?? [];
   return {
     schools: schools.data ?? [], supporters: supporter.data ?? [], proposals: proposals.data ?? [],
@@ -370,35 +287,24 @@ async function loadScoreData() {
   };
 }
 
-function displayName(nome: string, cognome: string) {
-  return `${nome.trim().charAt(0).toUpperCase()}. ${cognome.trim()}`;
-}
-
-async function leaderboard(request: Request) {
+async function overview(request: Request) {
   try {
-    const data = await loadScoreData();
-    const { ranking } = computeScores(data.supporters as Supporter[], data.proposals as Proposal[], data.activities as Activity[]);
+    const data = await loadParticipationData();
     const visited = new Set(data.activities.filter((item) => item.tipo === "visita" && item.scuola_id).map((item) => item.scuola_id));
     const offered = new Set(data.supporters.filter((item) => item.stato !== "archiviata").flatMap((item) => item.scuole as string[]));
-    const publicRanking = ranking.filter((entry) => entry.consenso).slice(0, LEADERBOARD_SIZE).map((entry, index) => ({
-      posizione: index + 1,
-      nome: displayName(entry.nome, entry.cognome),
-      punti: entry.punti,
-      livello: entry.livello,
-      badge: entry.badge,
-      visite: entry.visite,
-      mattinee: entry.mattinee,
-    }));
+    const participants = new Set<string>();
+    for (const item of data.supporters as Supporter[]) if (item.stato !== "archiviata") participants.add(personKey(item.nome, item.cognome));
+    for (const item of data.proposals as Proposal[]) if (item.stato !== "archiviata") participants.add(personKey(item.nome, item.cognome));
+    for (const item of data.activities as Activity[]) participants.add(personKey(item.nome, item.cognome));
     return json(request, {
       totali: {
-        docenti: ranking.length,
+        docenti: participants.size,
         scuole: data.schools.length,
         scuole_visitate: visited.size,
         scuole_con_disponibilita: data.schools.filter((school) => offered.has(school.id)).length,
         visite: data.activities.filter((item) => item.tipo === "visita").length,
         mattinee_proposte: data.proposals.filter((item) => item.stato !== "archiviata").length,
         mattinee_svolte: data.activities.filter((item) => item.tipo === "mattinee").length,
-        punti: ranking.reduce((sum, entry) => sum + entry.punti, 0),
       },
       scuole: data.schools.map((school) => ({
         id: school.id,
@@ -406,35 +312,21 @@ async function leaderboard(request: Request) {
         etichetta: school.etichetta,
         stato: visited.has(school.id) ? "visitata" : offered.has(school.id) ? "in_arrivo" : "libera",
       })),
-      classifica: publicRanking,
-      punti: POINTS,
     });
   } catch {
-    return json(request, { error: "Classifica non disponibile." }, 503);
+    return json(request, { error: "Dati di partecipazione non disponibili." }, 503);
   }
 }
 
 async function listContributions(request: Request) {
   try {
-    const data = await loadScoreData();
-    const { ranking } = computeScores(data.supporters as Supporter[], data.proposals as Proposal[], data.activities as Activity[]);
+    const data = await loadParticipationData();
     return json(request, {
       scuole: data.schools,
       disponibilita: data.supporters,
       proposte: data.proposals,
       attivita: data.activities,
       da_confermare: data.pendingActivities,
-      classifica: ranking.map((entry, index) => ({
-        posizione: index + 1,
-        nome: entry.nome,
-        cognome: entry.cognome,
-        consenso: entry.consenso,
-        punti: entry.punti,
-        livello: entry.livello,
-        visite: entry.visite,
-        mattinee: entry.mattinee,
-        proposte: entry.proposte,
-      })),
     });
   } catch {
     return json(request, { error: "Impossibile caricare le disponibilità." }, 500);
@@ -460,7 +352,7 @@ async function activityFields(payload: Record<string, unknown>) {
     if (error) throw new PublicServiceError();
     if (!school) throw new Error("Scuola non valida.");
   }
-  return { nome, cognome, tipo, scuola_id: scuolaId, titolo, data, nota, in_classifica: payload.in_classifica === true };
+  return { nome, cognome, tipo, scuola_id: scuolaId, titolo, data, nota };
 }
 
 async function registerActivity(request: Request, payload: Record<string, unknown>) {
@@ -775,7 +667,8 @@ Deno.serve(async (request: Request) => {
   if (action === "login") return await login(request, payload);
   if (action === "submit_supporter") return await submitSupporter(request, payload);
   if (action === "submit_proposal") return await submitProposal(request, payload);
-  if (action === "leaderboard") return await leaderboard(request);
+  // "leaderboard" resta come alias temporaneo per le copie in cache della pagina precedente.
+  if (action === "overview" || action === "leaderboard") return await overview(request);
   if (action === "report_activity") return await reportActivity(request, payload);
 
   const session = await verifySession(request);

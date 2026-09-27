@@ -128,7 +128,7 @@ function renderSupporters(schoolNames) {
     const card = el('article', 'review-card');
     const head = el('div', 'review-head');
     head.append(el('h4', '', `${item.nome} ${item.cognome}`), stateTag(SUPPORTER_STATES[item.stato], item.stato));
-    card.append(head, el('small', '', `${formatDate(item.created_at)} · Codice ${item.id.slice(0, 8).toUpperCase()} · ${item.in_classifica ? 'in classifica pubblica' : 'non in classifica pubblica'}`));
+    card.append(head, el('small', '', `${formatDate(item.created_at)} · Codice ${item.id.slice(0, 8).toUpperCase()}`));
     const chips = el('div', 'chips');
     for (const id of item.scuole) chips.append(el('span', '', schoolNames.get(id) || id));
     card.append(chips);
@@ -218,7 +218,7 @@ function renderActivities(schoolNames) {
     const card = activityCard(item, schoolNames);
     const actions = el('div', 'review-actions');
     actions.append(actionButton('Annulla registrazione', 'no', async (button) => {
-      if (!window.confirm('Annullare questa registrazione? I punti verranno tolti dalla classifica.')) return;
+      if (!window.confirm('Annullare questa registrazione? Non comparirà più nell’elenco delle attività confermate.')) return;
       button.disabled = true;
       try {
         await api('archive_activity', { id: item.id });
@@ -264,7 +264,7 @@ function renderPending(schoolNames) {
       }
     }));
     actions.append(actionButton('Scarta registrazione', 'no', async (button) => {
-      if (!window.confirm('Scartare questa registrazione? Non comparirà nell’elenco né in classifica.')) return;
+      if (!window.confirm('Scartare questa registrazione? Non comparirà nell’elenco delle attività confermate.')) return;
       button.disabled = true;
       try {
         await api('archive_activity', { id: item.id });
@@ -305,18 +305,6 @@ function exportActivities() {
   activityMessage.textContent = rows.length ? `Scaricato l’elenco: ${rows.length} ${rows.length === 1 ? 'attività confermata' : 'attività confermate'}.` : 'Nessuna attività confermata da scaricare.';
 }
 
-function renderRanking() {
-  const list = document.getElementById('adminRanking');
-  list.replaceChildren();
-  if (!data.classifica.length) list.append(el('p', 'empty', 'Non sono ancora presenti attività con punti assegnati.'));
-  for (const entry of data.classifica) {
-    const row = el('li');
-    row.append(el('strong', '', `${entry.nome} ${entry.cognome}`),
-      el('span', '', `${entry.punti} pt · ${entry.livello} · ${entry.visite} visite · ${entry.mattinee} Mattinée · ${entry.proposte} proposte${entry.consenso ? '' : ' · non in classifica pubblica'}`));
-    list.append(row);
-  }
-}
-
 function render() {
   const schoolNames = new Map(data.scuole.map((school) => [school.id, `${school.comune} · ${school.etichetta}`]));
   renderSummary();
@@ -325,14 +313,13 @@ function render() {
   renderProposals();
   renderSchools();
   renderActivities(schoolNames);
-  renderRanking();
 }
 
 async function load() {
   refreshButton.disabled = true;
   try {
     const result = await api('list_contributions');
-    data = { ...result, attivita: result.attivita || [], da_confermare: result.da_confermare || [], classifica: result.classifica || [] };
+    data = { ...result, attivita: result.attivita || [], da_confermare: result.da_confermare || [] };
     render();
     if (globalMessage.textContent === 'Caricamento…') globalMessage.textContent = '';
   } catch (error) {
@@ -388,16 +375,14 @@ activityForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   if (!activityForm.reportValidity()) return;
   const payload = Object.fromEntries(new FormData(activityForm).entries());
-  payload.in_classifica = activityForm.elements.in_classifica.checked;
   if (payload.tipo !== 'visita') delete payload.scuola_id;
   const button = activityForm.querySelector('button[type="submit"]');
   button.disabled = true;
   activityMessage.textContent = 'Registrazione in corso…';
   try {
     await api('register_activity', payload);
-    activityMessage.textContent = `Attività registrata. I punti sono stati assegnati a ${payload.nome} ${payload.cognome}.`;
+    activityMessage.textContent = `Attività registrata per ${payload.nome} ${payload.cognome}.`;
     for (const name of ['nome', 'cognome', 'nota', 'titolo']) activityForm.elements[name].value = '';
-    activityForm.elements.in_classifica.checked = false;
     await load();
   } catch (error) {
     handleError(error, activityMessage);

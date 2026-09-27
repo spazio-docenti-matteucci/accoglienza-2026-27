@@ -8,7 +8,7 @@
   <title>Gestione orientamento | IIS Meucci–Mattei, sede di Decimomannu</title>
   <link rel="stylesheet" href="portal.css?v=20260922-2">
   <link rel="stylesheet" href="orientamento-modulo.css?v=20260925-1">
-  <link rel="stylesheet" href="gestione.css?v=20260925-2">
+  <link rel="stylesheet" href="gestione.css?v=20260927-1">
 </head>
 <body>
   <header class="site-header">
@@ -24,7 +24,7 @@
     <section class="orientation-hero">
       <p class="eyebrow">Una scuola da vivere · Area della Funzione Strumentale</p>
       <h1>Gestione<br>orientamento</h1>
-      <p>Consulta e gestisci disponibilità, proposte Mattinée, attività da confermare, scuole visitate e classifica.</p>
+      <p>Consulta e gestisci disponibilità, proposte Mattinée, attività da confermare e scuole visitate.</p>
     </section>
 
     <section class="protected-shell" aria-labelledby="access-title">
@@ -57,16 +57,15 @@
           <button role="tab" data-tab="proposte" aria-selected="false">Proposte Mattinée <span class="count" id="countProposte"></span></button>
           <button role="tab" data-tab="scuole" aria-selected="false">Scuole</button>
           <button role="tab" data-tab="attivita" aria-selected="false">Attività confermate</button>
-          <button role="tab" data-tab="classifica" aria-selected="false">Classifica</button>
         </nav>
 
         <section class="tab-panel" data-panel="confermare">
-          <p class="panel-help">Visite e Mattinée registrate dai docenti. <b>Conferma l’attività</b> se si è svolta: entrerà nell’elenco per la Dirigente e assegnerà i punti. <b>Scarta la registrazione</b> se è un errore o un doppione.</p>
+          <p class="panel-help">Visite e Mattinée registrate dai docenti. <b>Conferma l’attività</b> se si è svolta: entrerà nell’elenco per la Dirigente. <b>Scarta la registrazione</b> se è un errore o un doppione.</p>
           <div class="review-list" id="pendingList"></div>
         </section>
 
         <section class="tab-panel" data-panel="candidature" hidden>
-          <p class="panel-help">Docenti che hanno dato la disponibilità per le visite nelle scuole secondarie di primo grado. <b>Conferma</b> le disponibilità concordate; <b>archivia</b> quelle non più valide. Le disponibilità archiviate non compaiono nella classifica né nel conteggio.</p>
+          <p class="panel-help">Docenti che hanno dato la disponibilità per le visite nelle scuole secondarie di primo grado. <b>Conferma</b> le disponibilità concordate; <b>archivia</b> quelle non più valide.</p>
           <div class="filters" data-filter-for="candidature">
             <button data-filter="ricevuta" aria-pressed="true">Da contattare</button>
             <button data-filter="assegnata" aria-pressed="false">Confermate</button>
@@ -77,7 +76,7 @@
         </section>
 
         <section class="tab-panel" data-panel="proposte" hidden>
-          <p class="panel-help">Laboratori e lezioni aperte proposti dai docenti. <b>Approva</b> vale +10 punti al docente.</p>
+          <p class="panel-help">Laboratori e lezioni aperte proposti dai docenti. Usa gli stati per distinguere le proposte da valutare, approvate e archiviate.</p>
           <div class="filters" data-filter-for="proposte">
             <button data-filter="aperte" aria-pressed="true">Da valutare</button>
             <button data-filter="approvata" aria-pressed="false">Approvate</button>
@@ -97,7 +96,7 @@
             <p class="panel-help">Qui trovi tutte le attività confermate. Il pulsante scarica l’elenco per la Dirigente (docente, attività, scuola, data), da aprire con Excel.</p>
             <button type="button" class="act ok" id="exportButton">Scarica elenco CSV</button>
           </div>
-          <p class="panel-help">Se un docente non ha registrato un’attività, puoi inserirla tu: risulta subito confermata. Visita +20 (+10 al primo docente in quella scuola), Mattinée realizzata +30.</p>
+          <p class="panel-help">Se un docente non ha registrato un’attività, puoi inserirla tu: risulterà subito confermata e sarà inclusa nell’elenco per la Dirigente.</p>
           <form id="activityForm" class="activity-form">
             <label>Nome <input name="nome" list="teacherNames" maxlength="80" required></label>
             <label>Cognome <input name="cognome" list="teacherSurnames" maxlength="80" required></label>
@@ -111,8 +110,7 @@
             <label id="activityTitleField" hidden>Titolo della Mattinée <input name="titolo" maxlength="160"></label>
             <label>Data <input name="data" type="date" required></label>
             <label class="activity-wide">Nota <span>facoltativa</span><input name="nota" maxlength="600"></label>
-            <label class="activity-check"><input type="checkbox" name="in_classifica"> Il docente acconsente a comparire nella classifica pubblica</label>
-            <button type="submit">Registra e assegna i punti</button>
+            <button type="submit">Registra l’attività</button>
           </form>
           <datalist id="teacherNames"></datalist><datalist id="teacherSurnames"></datalist>
           <p id="activityMessage" class="global-message" role="status" aria-live="polite"></p>
@@ -120,10 +118,6 @@
           <div class="review-list" id="activityList"></div>
         </section>
 
-        <section class="tab-panel" data-panel="classifica" hidden>
-          <p class="panel-help">Classifica completa con tutti i nomi. In quella pubblica compaiono solo i docenti che hanno dato il consenso, con iniziale e cognome.</p>
-          <ol class="full-ranking" id="adminRanking"></ol>
-        </section>
       </div>
     </section>
   </main>
@@ -132,6 +126,6 @@
     <p>IIS Meucci–Mattei, sede di Decimomannu</p>
     <p>Area riservata alla Funzione Strumentale per l’orientamento.</p>
   </footer>
-  <script src="gestione.js?v=20260925-2"></script>
+  <script src="gestione.js?v=20260927-1"></script>
 </body>
 </html>

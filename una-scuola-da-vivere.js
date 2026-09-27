@@ -10,23 +10,12 @@ const reportSchool = document.getElementById('reportSchool');
 const schoolChoices = document.getElementById('schoolChoices');
 const schoolError = document.getElementById('schoolError');
 const schoolCounter = document.getElementById('schoolCounter');
-
-const BADGES = {
-  esploratore: ['🧭', 'Esploratore'],
-  ambasciatore: ['🌍', 'Ambasciatore'],
-  apripista: ['🚀', 'Apripista'],
-  idee: ['💡', 'Fucina di idee'],
-  laboratorio: ['🔬', 'Laboratorio aperto'],
-};
-const QUOTES = [
-  'Le visite registrate entrano nel riepilogo della Funzione Strumentale.',
-  'Le disponibilità vengono abbinate dalla Funzione Strumentale.',
-  'Le proposte Mattinée vengono valutate dalla Commissione Orientamento.',
-  'La classifica pubblica mostra soltanto chi ha dato il consenso.',
-  'Dopo ogni attività, compila il modulo di registrazione.',
-];
+const schoolSearch = document.getElementById('schoolSearch');
+const schoolResults = document.getElementById('schoolResults');
+const schoolFilterButtons = [...document.querySelectorAll('[data-school-filter]')];
 
 let schoolStates = new Map();
+let schoolFilter = 'all';
 
 function setMessage(id, message, kind = '') {
   const element = document.getElementById(id);
@@ -74,6 +63,29 @@ function applySchoolStates() {
     const tag = option.querySelector('.school-tag');
     tag.textContent = state === 'visitata' ? 'Già visitata' : state === 'in_arrivo' ? 'Disponibilità presente' : 'Nessuna disponibilità';
   }
+  filterSchoolChoices();
+}
+
+function normalize(value) {
+  return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
+function filterSchoolChoices() {
+  const term = normalize(schoolSearch?.value.trim() || '');
+  let visible = 0;
+  for (const option of schoolChoices.querySelectorAll('.school-option')) {
+    const state = schoolStates.get(option.dataset.school) || 'libera';
+    const matchesText = !term || option.dataset.search.includes(term);
+    const matchesState = schoolFilter === 'all' || state === schoolFilter;
+    option.hidden = !(matchesText && matchesState);
+    if (!option.hidden) visible += 1;
+  }
+  for (const group of schoolChoices.querySelectorAll('.school-group')) {
+    group.hidden = !group.querySelector('.school-option:not([hidden])');
+  }
+  if (schoolResults) {
+    schoolResults.textContent = visible === 1 ? '1 scuola visibile' : `${visible} scuole visibili`;
+  }
 }
 
 function renderSchools(schools) {
@@ -96,6 +108,7 @@ function renderSchools(schools) {
       const label = document.createElement('label');
       label.className = 'school-option';
       label.dataset.school = school.id;
+      label.dataset.search = normalize(`${school.comune} ${school.etichetta}`);
       const input = document.createElement('input');
       input.type = 'checkbox';
       input.name = 'scuole';
@@ -120,6 +133,7 @@ function renderSchools(schools) {
     schoolError.hidden = selectedSchools().length > 0;
     updateSchoolCounter();
   });
+  filterSchoolChoices();
 }
 
 function fillReportSchools(schools) {
@@ -206,100 +220,24 @@ function renderMission(total, visited, offered) {
   }
 }
 
-function badgeList(badges) {
-  const wrap = document.createElement('span');
-  wrap.className = 'badges';
-  for (const key of badges || []) {
-    const [icon, label] = BADGES[key] || [];
-    if (!icon) continue;
-    const badge = document.createElement('span');
-    badge.textContent = icon;
-    badge.title = label;
-    badge.setAttribute('aria-label', label);
-    wrap.append(badge);
-  }
-  return wrap;
-}
-
-function renderLeaderboard(entries) {
-  const podium = document.getElementById('podium');
-  const ranking = document.getElementById('ranking');
-  podium.replaceChildren();
-  ranking.replaceChildren();
-  document.getElementById('rankingEmpty').hidden = entries.length > 0;
-  const medals = ['🥇', '🥈', '🥉'];
-  entries.slice(0, 3).forEach((entry, index) => {
-    const card = document.createElement('article');
-    card.className = `podium-step step-${index + 1}`;
-    const medal = document.createElement('span');
-    medal.className = 'medal';
-    medal.textContent = medals[index];
-    const name = document.createElement('strong');
-    name.textContent = entry.nome;
-    const level = document.createElement('small');
-    level.textContent = entry.livello;
-    const points = document.createElement('b');
-    points.textContent = `${entry.punti} pt`;
-    card.append(medal, name, level, badgeList(entry.badge), points);
-    podium.append(card);
-  });
-  for (const entry of entries.slice(3)) {
-    const row = document.createElement('li');
-    const position = document.createElement('span');
-    position.className = 'pos';
-    position.textContent = String(entry.posizione);
-    const who = document.createElement('span');
-    who.className = 'who';
-    const name = document.createElement('strong');
-    name.textContent = entry.nome;
-    const level = document.createElement('small');
-    level.textContent = entry.livello;
-    who.append(name, level);
-    const points = document.createElement('b');
-    points.textContent = `${entry.punti} pt`;
-    row.append(position, who, badgeList(entry.badge), points);
-    ranking.append(row);
-  }
-}
-
-async function loadLeaderboard(schools) {
+async function loadOverview(schools) {
   try {
     if (previewCatalog) throw new Error();
-    const data = await send('leaderboard', {});
+    const data = await send('overview', {});
     schoolStates = new Map(data.scuole.map((school) => [school.id, school.stato]));
     for (const [key, value] of Object.entries(data.totali)) setStat(key, value);
     renderMission(data.totali.scuole, data.totali.scuole_visitate, data.totali.scuole_con_disponibilita);
-    renderLeaderboard(data.classifica);
   } catch {
-    for (const key of ['scuole_visitate', 'docenti', 'mattinee_proposte', 'punti']) setStat(key, 0);
+    for (const key of ['scuole_visitate', 'scuole_con_disponibilita', 'mattinee_proposte']) setStat(key, 0);
     setStat('scuole', schools.length || 24);
     renderMission(schools.length || 24, 0, 0);
-    renderLeaderboard([]);
   }
   applySchoolStates();
   renderLights(schools);
 }
 
-function celebrate() {
-  const layer = document.getElementById('celebration');
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  layer.replaceChildren();
-  const pieces = ['🎉', '⭐', '🚀', '✨', '🏆'];
-  for (let i = 0; i < 36; i += 1) {
-    const piece = document.createElement('span');
-    piece.textContent = pieces[i % pieces.length];
-    piece.style.left = `${Math.random() * 100}%`;
-    piece.style.animationDelay = `${Math.random() * 0.6}s`;
-    piece.style.fontSize = `${16 + Math.random() * 18}px`;
-    layer.append(piece);
-  }
-  setTimeout(() => layer.replaceChildren(), 3200);
-}
-
 function fields(form) {
-  const data = Object.fromEntries(new FormData(form).entries());
-  data.in_classifica = form.elements.in_classifica.checked;
-  return data;
+  return Object.fromEntries(new FormData(form).entries());
 }
 
 async function submitForm(event, action, messageId) {
@@ -330,13 +268,12 @@ async function submitForm(event, action, messageId) {
     updateSchoolCounter();
     if (action === 'report_activity') resetReportForm();
     const text = {
-      submit_supporter: `Disponibilità inviata. Hai ricevuto 5 punti. Codice: ${result.codice}. La Funzione Strumentale ti contatterà per definire assegnazione, data e orario.`,
-      submit_proposal: `Proposta inviata. Hai ricevuto 10 punti. Codice: ${result.codice}. Se la proposta viene approvata riceverai altri 10 punti; la Commissione ti comunicherà l’esito.`,
-      report_activity: `Attività registrata. Codice: ${result.codice}. Dopo la conferma della Funzione Strumentale entrerà nell’elenco per la Dirigente e i punti saranno aggiornati.`,
+      submit_supporter: `Disponibilità inviata. Codice: ${result.codice}. La Funzione Strumentale ti contatterà per concordare scuola, data e orario.`,
+      submit_proposal: `Proposta inviata. Codice: ${result.codice}. La Commissione la valuterà e ti comunicherà l’esito.`,
+      report_activity: `Attività registrata. Codice: ${result.codice}. Dopo la verifica della Funzione Strumentale entrerà nel riepilogo destinato alla Dirigente.`,
     }[action];
     setMessage(messageId, text, 'success');
-    celebrate();
-    loadLeaderboard(currentSchools);
+    loadOverview(currentSchools);
   } catch (error) {
     setMessage(messageId, error.name === 'AbortError' ? 'La richiesta non ha ricevuto risposta. Prima di riprovare, verifica se la registrazione è già stata acquisita.' : error.message, 'error');
   } finally {
@@ -344,14 +281,10 @@ async function submitForm(event, action, messageId) {
   }
 }
 
-function rotateQuotes() {
-  const quote = document.getElementById('quote');
-  let index = 0;
-  setInterval(() => {
-    index = (index + 1) % QUOTES.length;
-    quote.classList.add('fade');
-    setTimeout(() => { quote.textContent = QUOTES[index]; quote.classList.remove('fade'); }, 400);
-  }, 7000);
+function openActionPanel(hash = window.location.hash) {
+  if (!hash) return;
+  const panel = document.querySelector(hash);
+  if (panel instanceof HTMLDetailsElement && panel.classList.contains('action-panel')) panel.open = true;
 }
 
 let currentSchools = [];
@@ -359,9 +292,27 @@ supporterForm.addEventListener('submit', (event) => submitForm(event, 'submit_su
 proposalForm.addEventListener('submit', (event) => submitForm(event, 'submit_proposal', 'proposalMessage'));
 reportForm.addEventListener('submit', (event) => submitForm(event, 'report_activity', 'reportMessage'));
 reportType.addEventListener('change', syncReportType);
+schoolSearch.addEventListener('input', filterSchoolChoices);
+for (const button of schoolFilterButtons) {
+  button.addEventListener('click', () => {
+    schoolFilter = button.dataset.schoolFilter;
+    for (const other of schoolFilterButtons) other.setAttribute('aria-pressed', String(other === button));
+    filterSchoolChoices();
+  });
+}
+for (const panel of document.querySelectorAll('.action-panel')) {
+  const label = panel.querySelector('.summary-action span');
+  const syncLabel = () => { label.textContent = panel.open ? 'Chiudi il modulo' : 'Apri il modulo'; };
+  panel.addEventListener('toggle', syncLabel);
+  syncLabel();
+}
+for (const link of document.querySelectorAll('a[href^="#"]')) {
+  link.addEventListener('click', () => openActionPanel(link.getAttribute('href')));
+}
+window.addEventListener('hashchange', () => openActionPanel());
 resetReportForm();
 loadSchools().then((schools) => {
   currentSchools = schools;
-  return loadLeaderboard(schools);
+  return loadOverview(schools);
 });
-rotateQuotes();
+openActionPanel();
