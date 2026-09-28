@@ -7,7 +7,7 @@
   <meta name="description" content="Area riservata ai docenti della Commissione Orientamento dell’IIS Meucci–Mattei, sede di Decimomannu.">
   <title>Commissione Orientamento | Area riservata</title>
   <link rel="stylesheet" href="portal.css?v=20260922-2">
-  <link rel="stylesheet" href="orientamento-modulo.css?v=20260925-1">
+  <link rel="stylesheet" href="orientamento-modulo.css?v=20260928-1">
 </head>
 <body>
   <header class="site-header">
@@ -25,8 +25,11 @@
       <a class="back-link" href="index.html"><span aria-hidden="true">←</span> Torna alla pagina iniziale</a>
       <p class="eyebrow">Area docenti · Accesso riservato</p>
       <h1>Commissione<br>Orientamento</h1>
-      <p>Presentazione dell’analisi demografica per l’orientamento a Decimomannu.</p>
-      <a class="supporter-page-link" href="una-scuola-da-vivere.html">Vai alle disponibilità e alle proposte dei docenti <span aria-hidden="true">→</span></a>
+      <p class="orientation-lead">Lo spazio di lavoro riservato ai componenti della Commissione per consultare i materiali interni e coordinare le attività.</p>
+      <div class="hero-resource-links">
+        <a class="supporter-page-link primary" href="una-scuola-da-vivere.html">Disponibilità, proposte e attività <span aria-hidden="true">→</span></a>
+        <a class="supporter-page-link" href="territorio.html">Territori e scuole da incontrare <span aria-hidden="true">→</span></a>
+      </div>
     </section>
 
     <section class="protected-shell" aria-labelledby="access-title">
@@ -47,27 +50,22 @@
 
       <div class="workspace-panel" id="workspacePanel" hidden>
         <div class="workspace-heading">
-          <div><p class="step">Commissione Orientamento</p><h2 id="workspaceTitle" tabindex="-1">Analisi del bacino di Decimomannu</h2></div>
+          <div><p class="step">Commissione Orientamento</p><h2 id="workspaceTitle" tabindex="-1">Materiali della Commissione</h2></div>
           <div class="workspace-session"><span class="role-badge" id="roleBadge"></span><button class="logout-button" id="logoutButton" type="button">Esci</button></div>
         </div>
 
-        <div class="documents-heading"><p class="step">Presentazione</p><h3>Popolazione residente e coorti 2008–2013</h3></div>
+        <p class="workspace-intro">La lettura del territorio è ora disponibile nella pagina pubblica <a href="territorio.html">Territori e scuole da incontrare</a>. Qui restano i documenti destinati al lavoro interno della Commissione.</p>
+        <div class="documents-heading"><p class="step">Archivio interno</p><h3>Documenti condivisi</h3></div>
         <div class="resource-grid" id="resourceGrid"></div>
 
       </div>
     </section>
   </main>
 
-  <div class="presentation-viewer" id="presentationViewer" role="dialog" aria-modal="true" aria-label="Presentazione del bacino" hidden>
-    <div class="presentation-toolbar"><strong id="presentationViewerTitle">Presentazione</strong><button id="closePresentation" type="button">Chiudi presentazione</button></div>
-    <p id="presentationViewerMessage" role="status"></p>
-    <iframe id="presentationFrame" title="Presentazione del bacino" sandbox="allow-scripts allow-popups" referrerpolicy="no-referrer"></iframe>
-  </div>
-
   <footer class="site-footer">
     <p>IIS Meucci–Mattei, sede di Decimomannu</p>
     <p>Questo spazio non sostituisce il sito istituzionale della scuola.</p>
   </footer>
-  <script src="orientamento.js?v=20260925-2"></script>
+  <script src="orientamento.js?v=20260928-1"></script>
 </body>
 </html>

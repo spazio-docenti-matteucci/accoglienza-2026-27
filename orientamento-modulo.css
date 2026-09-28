@@ -1,6 +1,11 @@
-.supporter-page-link { width: fit-content; max-width: 100%; display: inline-block; margin-top: 23px; padding: 12px 16px; border: 1px solid rgb(255 255 255 / 45%); border-radius: 13px; color: white; background: rgb(255 255 255 / 12%); font-size: .83rem; font-weight: 800; text-decoration: none; }
+.orientation-lead { max-width: 670px; margin: 0; color: #d9e7ec; font-size: 1rem; line-height: 1.5; }
+.hero-resource-links { margin-top: 23px; display: flex; flex-wrap: wrap; gap: 9px; }
+.supporter-page-link { width: fit-content; max-width: 100%; display: inline-block; padding: 12px 16px; border: 1px solid rgb(255 255 255 / 45%); border-radius: 13px; color: white; background: rgb(255 255 255 / 12%); font-size: .83rem; font-weight: 800; text-decoration: none; }
+.supporter-page-link.primary { color: var(--navy); border-color: white; background: white; }
 .supporter-page-link:hover { background: rgb(255 255 255 / 22%); }
+.supporter-page-link.primary:hover { background: #f4ffe9; }
 .supporter-page-link span { margin-left: 8px; }
+.workspace-intro a { color: var(--green); font-weight: 850; text-underline-offset: 3px; }
 .contribution-panel { margin-top: 38px; padding-top: 30px; border-top: 1px solid var(--line); }
 .contribution-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; }
 .contribution-heading h3 { margin: 7px 0 10px; color: var(--navy); font-size: clamp(1.4rem, 3vw, 2rem); letter-spacing: -.04em; }
@@ -33,6 +38,7 @@
 .contribution-status select { width: 100%; padding: 9px; border: 1px solid #b9cbd1; border-radius: 9px; color: var(--ink); background: white; font: inherit; }
 @media (max-width: 850px) { .coverage-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 650px) { .contribution-heading { align-items: flex-start; flex-direction: column; } .contribution-summary, .contribution-columns, .coverage-grid { grid-template-columns: 1fr; } }
+@media (max-width: 520px) { .hero-resource-links { display: grid; } .supporter-page-link { width: 100%; } }
 .activity-panel { margin: 0 0 28px; padding: 22px; border: 1px solid #d9e9df; border-radius: 16px; background: #f6fbf7; }
 .activity-panel h4 { margin: 0 0 6px; color: var(--navy); font-size: 1.12rem; }
 .activity-panel > p { margin: 0 0 16px; color: var(--muted); font-size: .8rem; line-height: 1.45; }

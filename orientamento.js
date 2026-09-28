@@ -9,15 +9,9 @@ const accessMessage = document.getElementById('accessMessage');
 const logoutButton = document.getElementById('logoutButton');
 const resourceGrid = document.getElementById('resourceGrid');
 const roleBadge = document.getElementById('roleBadge');
-const presentationViewer = document.getElementById('presentationViewer');
-const presentationFrame = document.getElementById('presentationFrame');
-const presentationViewerTitle = document.getElementById('presentationViewerTitle');
-const presentationViewerMessage = document.getElementById('presentationViewerMessage');
-const closePresentationButton = document.getElementById('closePresentation');
 
 let sessionToken = sessionStorage.getItem(SESSION_KEY) || '';
 let accessLevel = '';
-let presentationTrigger = null;
 
 async function api(action, payload = {}, formData = null) {
   const headers = {};
@@ -56,46 +50,12 @@ function setAuthenticated(level) {
 }
 
 function resetSession() {
-  closePresentation(false);
   sessionToken = '';
   accessLevel = '';
   sessionStorage.removeItem(SESSION_KEY);
   resourceGrid.replaceChildren();
   workspacePanel.hidden = true;
   loginPanel.hidden = false;
-}
-
-function closePresentation(restoreFocus = true) {
-  presentationFrame.removeAttribute('srcdoc');
-  presentationViewer.hidden = true;
-  if (restoreFocus) (presentationTrigger || document.getElementById('workspaceTitle')).focus();
-  presentationTrigger = null;
-}
-
-async function openPresentation(item) {
-  presentationViewerTitle.textContent = item.title;
-  presentationViewerMessage.textContent = 'Caricamento della presentazione…';
-  presentationFrame.removeAttribute('srcdoc');
-  presentationViewer.hidden = false;
-  closePresentationButton.focus();
-  try {
-    const result = await api('view_presentation', { document_id: item.id });
-    if (presentationViewer.hidden) return;
-    presentationFrame.srcdoc = result.html;
-    presentationViewerMessage.textContent = '';
-  } catch (error) {
-    presentationViewerMessage.textContent = error.message;
-    if (error.status === 401) resetSession();
-  }
-}
-
-function createActionButton(label, className, handler) {
-  const button = document.createElement('button');
-  button.type = 'button';
-  button.className = className;
-  button.textContent = label;
-  button.addEventListener('click', handler);
-  return button;
 }
 
 function renderDocument(item) {
@@ -113,13 +73,7 @@ function renderDocument(item) {
 
   const actions = document.createElement('div');
   actions.className = 'document-actions';
-  if (item.kind === 'presentation') {
-    const openButton = createActionButton('Apri presentazione', 'presentation-open', () => {
-      presentationTrigger = openButton;
-      openPresentation(item);
-    });
-    actions.append(openButton);
-  } else if (item.url) {
+  if (item.url) {
     const openLink = document.createElement('a');
     openLink.href = item.url;
     openLink.target = '_blank';
@@ -137,20 +91,19 @@ function renderDocument(item) {
 }
 
 async function loadDocuments() {
-  resourceGrid.textContent = 'Caricamento della presentazione…';
+  resourceGrid.textContent = 'Caricamento dei documenti…';
   try {
     const result = await api('list');
+    const internalDocuments = result.documents.filter((item) => item.kind !== 'presentation');
     resourceGrid.replaceChildren();
-    if (!result.documents.length) {
+    if (!internalDocuments.length) {
       const empty = document.createElement('p');
       empty.className = 'resource-empty';
-      empty.textContent = 'Non ci sono presentazioni disponibili.';
+      empty.textContent = 'Al momento non ci sono documenti interni disponibili.';
       resourceGrid.append(empty);
       return;
     }
-    result.documents.forEach((item) => resourceGrid.append(renderDocument(item)));
-    const presentation = result.documents.find((item) => item.kind === 'presentation');
-    if (presentation) await openPresentation(presentation);
+    internalDocuments.forEach((item) => resourceGrid.append(renderDocument(item)));
   } catch (error) {
     if (error.status === 401) resetSession();
     else resourceGrid.textContent = error.message;
@@ -176,11 +129,6 @@ passwordForm.addEventListener('submit', async (event) => {
   } finally {
     submitButton.disabled = false;
   }
-});
-
-closePresentationButton.addEventListener('click', closePresentation);
-document.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape' && !presentationViewer.hidden) closePresentation();
 });
 
 logoutButton.addEventListener('click', async () => {

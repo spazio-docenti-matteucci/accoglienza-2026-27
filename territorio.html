@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="description" content="Territori, scuole e dati demografici utili ai docenti che partecipano alle visite di orientamento dell’IIS Meucci–Mattei, sede di Decimomannu.">
+  <title>Territori e scuole da incontrare | IIS Meucci–Mattei, sede di Decimomannu</title>
+  <link rel="stylesheet" href="portal.css?v=20260922-2">
+  <link rel="stylesheet" href="territorio.css?v=20260928-1">
+</head>
+<body>
+  <a class="skip-link" href="#contenuto">Vai al contenuto</a>
+  <header class="site-header">
+    <a class="site-brand" href="index.html" aria-label="Torna alla pagina iniziale">
+      <span class="context-logo" role="img" aria-label="IIS A. Meucci – E. Mattei, sede di Decimomannu"><img src="assets/decimomannu-cresce-qui-contesto.png" alt=""></span>
+    </a>
+    <nav class="page-nav" aria-label="Navigazione principale">
+      <a href="index.html">Home</a>
+      <a href="una-scuola-da-vivere.html">Visite e Mattinée</a>
+    </nav>
+  </header>
+
+  <main class="territory-main" id="contenuto">
+    <section class="territory-hero" aria-labelledby="page-title">
+      <div class="territory-hero-copy">
+        <a class="back-link" href="una-scuola-da-vivere.html"><span aria-hidden="true">←</span> Torna a Una scuola da vivere</a>
+        <p class="eyebrow">Orientamento 2026/27 · Lettura del territorio</p>
+        <h1 id="page-title">Territori e scuole<br><span>da incontrare</span></h1>
+        <p class="hero-lead">Una guida per preparare le visite: mostra dove si trovano le scuole dell’elenco operativo e quanti ragazzi di 12 anni risiedono nei comuni osservati.</p>
+        <nav class="hero-jumps" aria-label="Vai a una sezione">
+          <a href="#mappa">Esplora la mappa</a>
+          <a href="#scuole-territorio">Leggi scuole e comuni</a>
+          <a href="#andamento">Guarda l’andamento</a>
+        </nav>
+      </div>
+      <div class="territory-hero-facts" aria-label="Dati principali">
+        <article><strong>19</strong><span>comuni osservati nella lettura demografica</span></article>
+        <article><strong>1.302</strong><span>residenti di 12 anni al 1° gennaio 2026</span></article>
+        <article><strong>24</strong><span>scuole o sedi nell’elenco operativo delle visite</span></article>
+      </div>
+    </section>
+
+    <section class="reading-note" aria-labelledby="reading-title">
+      <p class="kicker">Come leggere questa pagina</p>
+      <h2 id="reading-title">Persone, scuole e territorio. Non una previsione di iscrizioni.</h2>
+      <div class="reading-grid">
+        <article>
+          <span class="reading-icon" aria-hidden="true">01</span>
+          <div><h3>Che cosa mostra</h3><p>Il numero dei residenti di 12 anni nei comuni e l’associazione con le scuole presenti nell’elenco di lavoro dell’orientamento.</p></div>
+        </article>
+        <article>
+          <span class="reading-icon" aria-hidden="true">02</span>
+          <div><h3>Che cosa non mostra</h3><p>Non indica quanti alunni frequentano ciascuna scuola e non permette di prevedere quante iscrizioni riceverà la sede di Decimomannu.</p></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="map-section" id="mappa" aria-labelledby="map-title">
+      <div class="section-heading">
+        <div><p class="kicker">Una mappa da esplorare</p><h2 id="map-title">Seleziona un comune</h2></div>
+        <p>I cerchi rappresentano i residenti della coorte 2013. La loro dimensione cresce con il numero dei residenti di 12 anni.</p>
+      </div>
+      <div class="map-layout">
+        <div class="map-card">
+          <div class="map-tools" role="group" aria-label="Filtra i comuni della mappa">
+            <button type="button" data-map-filter="all" aria-pressed="true">Tutti · 1.302</button>
+            <button type="button" data-map-filter="focus" aria-pressed="false">Provenienza · 776</button>
+            <button type="button" data-map-filter="other" aria-pressed="false">Altri · 526</button>
+          </div>
+          <svg id="catchmentMap" class="map-canvas" viewBox="0 0 560 520" role="img" aria-labelledby="map-svg-title map-svg-desc">
+            <title id="map-svg-title">Mappa schematica dei 19 comuni</title>
+            <desc id="map-svg-desc">Seleziona un comune per leggere il numero di residenti di 12 anni, l’andamento delle coorti e le scuole associate.</desc>
+          </svg>
+          <div class="map-legend" aria-label="Legenda della mappa">
+            <span><i class="legend-focus"></i>Comuni di provenienza</span>
+            <span><i class="legend-other"></i>Altri comuni osservati</span>
+            <span>La mappa è schematica e non rappresenta tempi di viaggio.</span>
+          </div>
+        </div>
+        <aside class="town-detail" aria-live="polite" aria-labelledby="detailTown">
+          <p class="detail-kicker" id="detailArea">Comune di provenienza</p>
+          <h3 id="detailTown">Decimomannu</h3>
+          <div class="detail-count"><strong id="detailValue">73</strong><span>residenti di 12 anni<br>al 1° gennaio 2026</span></div>
+          <div class="detail-series" id="detailSeries" aria-label="Residenti di 12 anni per coorte dal 2008 al 2013"></div>
+          <div class="detail-row"><span>Distanza indicativa</span><b id="detailDistance">0,0 km</b></div>
+          <div class="detail-row"><span>Variazione 2008 → 2013</span><b id="detailLongChange">+2,8%</b></div>
+          <div class="detail-schools"><strong>Scuole o sedi nell’elenco operativo</strong><ul id="detailSchools"><li>L. Da Vinci</li></ul></div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="schools-section" id="scuole-territorio" aria-labelledby="schools-title">
+      <div class="section-heading">
+        <div><p class="kicker">Prima della visita</p><h2 id="schools-title">Scuole e comuni da conoscere</h2></div>
+        <p>Il numero, quando presente, riguarda i residenti dodicenni del comune. Non è il numero degli alunni iscritti nella scuola.</p>
+      </div>
+      <div class="school-groups" id="schoolGroups" aria-live="polite">
+        <p class="loading-message">Caricamento dell’elenco delle scuole…</p>
+      </div>
+      <aside class="operational-note">
+        <strong>Nota operativa</strong>
+        <p>Le denominazioni derivano dall’elenco di lavoro della campagna, aggiornato il 23 luglio 2026. Prima di contattare una sede occorre verificarne denominazione e riferimenti per l’anno scolastico 2026/27.</p>
+      </aside>
+    </section>
+
+    <section class="trends-section" id="andamento" aria-labelledby="trends-title">
+      <div class="section-heading">
+        <div><p class="kicker">Uno sguardo nel tempo</p><h2 id="trends-title">Le coorti 2008–2013</h2></div>
+        <p>Ogni coorte è osservata quando ha 12 anni: dal dato 2021 per i nati nel 2008 al dato 2026 per i nati nel 2013.</p>
+      </div>
+      <div class="trend-summary">
+        <article><span>19 comuni</span><strong>1.382 → 1.302</strong><p>Residenti dodicenni dalla coorte 2008 alla coorte 2013: <b>−5,8%</b>.</p></article>
+        <article><span>11 comuni di provenienza</span><strong>793 → 776</strong><p>Residenti dodicenni dalla coorte 2008 alla coorte 2013: <b>−2,1%</b>.</p></article>
+        <article><span>Ultimo passaggio</span><strong>834 → 776</strong><p>Negli 11 comuni, dalla coorte 2012 alla coorte 2013: <b>−7,0%</b>.</p></article>
+      </div>
+      <div class="chart-grid">
+        <figure>
+          <img src="assets/coorti-residenti-territorio-2008-2013.png" alt="Grafico dei residenti di 12 anni nei 19 comuni per le coorti dal 2008 al 2013.">
+          <figcaption>L’intero territorio osservato: 19 comuni.</figcaption>
+        </figure>
+        <figure>
+          <img src="assets/coorti-residenti-provenienza-2008-2013.png" alt="Grafico dei residenti di 12 anni negli 11 comuni di provenienza per le coorti dal 2008 al 2013.">
+          <figcaption>Gli 11 comuni dai quali provengono iscritti alla sede.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="data-section" aria-labelledby="data-title">
+      <div class="section-heading">
+        <div><p class="kicker">Per chi vuole approfondire</p><h2 id="data-title">I dati comune per comune</h2></div>
+        <p>La tabella completa rende verificabile la lettura e permette di confrontare le sei coorti senza trasformarle in una previsione.</p>
+      </div>
+      <details class="data-disclosure">
+        <summary><span>Apri la tabella dei 19 comuni</span><small>Coorti 2008–2013 e variazioni</small><b aria-hidden="true">⌄</b></summary>
+        <div class="table-shell">
+          <table id="territoryTable">
+            <caption>Residenti di 12 anni nei 19 comuni, coorti dal 2008 al 2013</caption>
+            <thead><tr><th scope="col">Comune</th><th scope="col">2008</th><th scope="col">2009</th><th scope="col">2010</th><th scope="col">2011</th><th scope="col">2012</th><th scope="col">2013</th><th scope="col">2008 → 2013</th><th scope="col">Gruppo</th></tr></thead>
+            <tbody></tbody>
+            <tfoot></tfoot>
+          </table>
+        </div>
+      </details>
+      <div class="sources">
+        <h3>Fonti e limiti</h3>
+        <p>Dati demografici: <a href="https://demo.istat.it/app/?i=POS">ISTAT, Popolazione residente per età, sesso e stato civile al 1° gennaio</a>; archivi comunali POSAS 2021–2026, età compiuta 12 anni. Il dato 2026 è indicato da ISTAT come stima.</p>
+        <p>I dati descrivono residenti per età nei comuni. Non sono dati sugli iscritti alle scuole, sulle preferenze delle famiglie o sulle future iscrizioni all’IIS Meucci–Mattei, sede di Decimomannu.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer"><p>IIS Meucci–Mattei, sede di Decimomannu</p><p>Questo spazio, curato dai docenti, non è il sito istituzionale e non lo sostituisce.</p></footer>
+  <script src="territorio.js?v=20260928-1"></script>
+</body>
+</html>
